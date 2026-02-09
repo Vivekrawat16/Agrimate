@@ -113,40 +113,40 @@ const DiseasePrediction = () => {
                                 className={`flex ${msg.type === 'user' ? 'justify-end' : 'justify-start'}`}
                             >
                                 <div className={`flex items-end gap-3 max-w-[90%] ${msg.type === 'user' ? 'flex-row-reverse' : ''}`}>
-                                    <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${msg.type === 'user' ? 'bg-gray-200' : 'bg-red-100 text-red-600'}`}>
-                                        {msg.type === 'user' ? <User size={16} className="text-gray-600" /> : <Activity size={18} />}
+                                    <div className={`w-6 h-6 md:w-8 md:h-8 rounded-full flex items-center justify-center shrink-0 ${msg.type === 'user' ? 'bg-gray-200' : 'bg-red-100 text-red-600'}`}>
+                                        {msg.type === 'user' ? <User size={14} className="text-gray-600 md:w-4 md:h-4" /> : <Activity size={14} className="md:w-4.5 md:h-4.5" />}
                                     </div>
 
                                     {msg.type === 'result' ? (
                                         <div className="w-full">
                                             {msg.data.possible_diseases?.map((disease, i) => (
-                                                <div key={i} className="bg-white rounded-2xl shadow-soft p-5 border-l-4 border-red-500 mb-4 overflow-hidden relative">
-                                                    <div className="absolute top-0 right-0 bg-red-100 text-red-800 px-3 py-1 text-xs font-bold rounded-bl-lg uppercase">
+                                                <div key={i} className="bg-white rounded-2xl shadow-soft p-4 md:p-5 border-l-4 border-red-500 mb-4 overflow-hidden relative">
+                                                    <div className="absolute top-0 right-0 bg-red-100 text-red-800 px-2 py-0.5 md:px-3 md:py-1 text-[10px] md:text-xs font-bold rounded-bl-lg uppercase">
                                                         {disease.urgency_level}
                                                     </div>
-                                                    <h3 className="text-xl font-bold text-red-700 flex items-center gap-2 mb-2">
-                                                        <Skull size={20} /> {disease.name}
+                                                    <h3 className="text-lg md:text-xl font-bold text-red-700 flex items-center gap-2 mb-2">
+                                                        <Skull size={18} className="md:w-5 md:h-5" /> {disease.name}
                                                     </h3>
-                                                    <p className="text-gray-500 text-sm mb-4">Confidence: {disease.confidence}</p>
+                                                    <p className="text-gray-500 text-xs md:text-sm mb-3 md:mb-4">Confidence: {disease.confidence}</p>
 
-                                                    <div className="space-y-3">
-                                                        <div className="bg-green-50 p-3 rounded-lg border border-green-100">
-                                                            <p className="font-bold text-green-800 flex items-center gap-2 text-sm mb-1"><ShieldCheck size={14} /> Organic Solution</p>
-                                                            <p className="text-sm text-gray-700">{disease.organic_solution}</p>
+                                                    <div className="space-y-2 md:space-y-3">
+                                                        <div className="bg-green-50 p-2 md:p-3 rounded-lg border border-green-100">
+                                                            <p className="font-bold text-green-800 flex items-center gap-2 text-xs md:text-sm mb-1"><ShieldCheck size={12} className="md:w-3.5 md:h-3.5" /> Organic Solution</p>
+                                                            <p className="text-xs md:text-sm text-gray-700">{disease.organic_solution}</p>
                                                         </div>
-                                                        <div className="bg-blue-50 p-3 rounded-lg border border-blue-100">
-                                                            <p className="font-bold text-blue-800 flex items-center gap-2 text-sm mb-1"><CloudRain size={14} /> Chemical Solution</p>
-                                                            <p className="text-sm text-gray-700">{disease.chemical_solution}</p>
+                                                        <div className="bg-blue-50 p-2 md:p-3 rounded-lg border border-blue-100">
+                                                            <p className="font-bold text-blue-800 flex items-center gap-2 text-xs md:text-sm mb-1"><CloudRain size={12} className="md:w-3.5 md:h-3.5" /> Chemical Solution</p>
+                                                            <p className="text-xs md:text-sm text-gray-700">{disease.chemical_solution}</p>
                                                         </div>
                                                     </div>
                                                 </div>
                                             ))}
-                                            <button onClick={() => window.location.reload()} className="w-full py-3 mt-2 bg-gray-100 rounded-xl text-gray-600 font-medium hover:bg-gray-200 transition-colors">
+                                            <button onClick={() => window.location.reload()} className="w-full py-2 md:py-3 mt-2 bg-gray-100 rounded-xl text-gray-600 font-medium hover:bg-gray-200 transition-colors text-sm md:text-base">
                                                 New Diagnosis
                                             </button>
                                         </div>
                                     ) : (
-                                        <div className={`p-4 rounded-2xl shadow-sm text-base leading-relaxed ${msg.type === 'user'
+                                        <div className={`p-3 md:p-4 rounded-2xl shadow-sm text-xs md:text-base leading-relaxed ${msg.type === 'user'
                                             ? 'bg-red-50 text-red-900 rounded-br-none shadow-sm border border-red-100'
                                             : 'bg-white text-text-dark rounded-bl-none border border-gray-100'
                                             }`}
@@ -158,17 +158,17 @@ const DiseasePrediction = () => {
                         ))}
                     </AnimatePresence>
                     {isTyping && (
-                        <div className="flex items-center gap-2 text-gray-400 text-sm ml-12">
-                            <Loader2 size={16} className="animate-spin" /> Diagnosis in progress...
+                        <div className="flex items-center gap-2 text-gray-400 text-xs md:text-sm ml-8 md:ml-12">
+                            <Loader2 size={14} className="animate-spin md:w-4 md:h-4" /> Diagnosis in progress...
                         </div>
                     )}
                     <div ref={messagesEndRef} />
                 </div>
             </div>
 
-            <div className="fixed bottom-[4.5rem] md:bottom-0 w-full bg-white border-t border-gray-100 p-4 pb-6 z-40 transition-all duration-300">
+            <div className="fixed bottom-20 md:bottom-0 w-full bg-white border-t border-gray-100 px-2 py-2 md:p-4 md:pb-6 z-[60] transition-all duration-300">
                 {!loading && !isTyping && step < questions.length && questions[step].options?.length > 0 && (
-                    <div className="container mx-auto max-w-2xl px-2 mb-3 flex gap-2 overflow-x-auto no-scrollbar py-1">
+                    <div className="container mx-auto max-w-2xl px-2 mb-2 md:mb-3 flex gap-2 overflow-x-auto no-scrollbar py-1">
                         {questions[step].options.map((opt, idx) => (
                             <button
                                 key={idx}
@@ -176,7 +176,7 @@ const DiseasePrediction = () => {
                                     setInput(opt);
                                     setTimeout(() => document.getElementById('chat-submit-btn').click(), 0);
                                 }}
-                                className="whitespace-nowrap px-4 py-2 bg-red-50 text-red-700 rounded-full text-sm font-medium border border-red-200 hover:bg-red-100 transition-colors shadow-sm"
+                                className="whitespace-nowrap px-3 py-1.5 md:px-4 md:py-2 bg-red-50 text-red-700 rounded-full text-xs md:text-sm font-medium border border-red-200 hover:bg-red-100 transition-colors shadow-sm"
                             >
                                 {opt}
                             </button>
@@ -184,21 +184,33 @@ const DiseasePrediction = () => {
                     </div>
                 )}
 
-                <form onSubmit={handleSend} className="container mx-auto max-w-2xl flex items-center gap-2">
-                    <input
-                        type="text"
-                        value={input}
-                        onChange={(e) => setInput(e.target.value)}
-                        placeholder={isListening ? "Listening..." : "Describe symptoms..."}
-                        className={`flex-1 h-14 pl-6 pr-4 bg-gray-50 rounded-full text-lg text-black transition-all outline-none placeholder:text-gray-400 ${isListening ? 'border-2 border-red-400 ring-2 ring-red-200' : 'border-transparent focus:border-red-500/30 focus:bg-white focus:ring-4 focus:ring-red-500/10'}`}
-                        disabled={loading || isTyping}
-                        autoFocus
-                    />
+                <form onSubmit={handleSend} className="w-full max-w-2xl mx-auto flex items-center gap-2">
+                    <div className="relative flex-1 min-w-0">
+                        <input
+                            type="text"
+                            value={input}
+                            onChange={(e) => setInput(e.target.value)}
+                            placeholder={isListening ? "Listening..." : "Describe symptoms..."}
+                            className={`w-full h-9 md:h-14 pl-3 md:pl-6 pr-8 md:pr-4 bg-gray-50 rounded-full text-sm md:text-lg text-black transition-all outline-none placeholder:text-gray-400 ${isListening ? 'border-2 border-red-400 ring-2 ring-red-200' : 'border-transparent focus:border-red-500/30 focus:bg-white focus:ring-4 focus:ring-red-500/10'}`}
+                            disabled={loading || isTyping}
+                            autoFocus
+                        />
+                        {speechSupported && (
+                            <button
+                                type="button"
+                                onClick={toggleListening}
+                                className={`absolute right-1 top-1/2 -translate-y-1/2 p-1.5 rounded-full md:hidden transition-all ${isListening ? 'text-red-500 animate-pulse bg-red-50' : 'text-gray-400 hover:text-red-600'}`}
+                            >
+                                {isListening ? <MicOff size={16} /> : <Mic size={16} />}
+                            </button>
+                        )}
+                    </div>
+
                     {speechSupported && (
                         <button
                             type="button"
                             onClick={toggleListening}
-                            className={`h-12 w-12 rounded-full flex items-center justify-center transition-all shrink-0 ${isListening ? 'bg-red-500 text-white animate-pulse' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+                            className={`hidden md:flex h-12 w-12 rounded-full items-center justify-center transition-all shrink-0 ${isListening ? 'bg-red-500 text-white animate-pulse' : 'bg-gray-100 text-gray-600 hover:bg-red-100 hover:text-red-600'}`}
                         >
                             {isListening ? <MicOff size={20} /> : <Mic size={20} />}
                         </button>
@@ -207,9 +219,9 @@ const DiseasePrediction = () => {
                         id="chat-submit-btn"
                         type="submit"
                         disabled={!input.trim() || loading || isTyping}
-                        className="h-12 w-12 bg-gray-900 rounded-full flex items-center justify-center text-white hover:bg-gray-800 transition-colors disabled:opacity-50 shrink-0"
+                        className="h-9 w-9 md:h-12 md:w-12 bg-black rounded-full flex items-center justify-center text-white hover:bg-gray-900 transition-colors disabled:opacity-50 shrink-0"
                     >
-                        {loading ? <Loader2 size={20} className="animate-spin" /> : <Send size={20} />}
+                        {loading ? <Loader2 size={16} className="animate-spin md:w-5 md:h-5" /> : <Send size={16} className="md:w-5 md:h-5" />}
                     </button>
                 </form>
             </div>

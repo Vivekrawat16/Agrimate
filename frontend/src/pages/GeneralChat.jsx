@@ -156,11 +156,11 @@ const GeneralChat = () => {
                                     exit={{ opacity: 0 }}
                                     className={`flex items-start gap-3 ${msg.type === 'user' ? 'flex-row-reverse' : ''}`}
                                 >
-                                    <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${msg.type === 'user' ? 'bg-primary-green text-white' : 'bg-gray-100 text-primary-green'}`}>
-                                        {msg.type === 'user' ? <User size={16} /> : <Bot size={16} />}
+                                    <div className={`w-6 h-6 md:w-8 md:h-8 rounded-full flex items-center justify-center shrink-0 ${msg.type === 'user' ? 'bg-primary-green text-white' : 'bg-gray-100 text-primary-green'}`}>
+                                        {msg.type === 'user' ? <User size={14} className="md:w-4 md:h-4" /> : <Bot size={14} className="md:w-4 md:h-4" />}
                                     </div>
 
-                                    <div className={`p-4 rounded-2xl max-w-[85%] text-sm leading-relaxed shadow-sm ${msg.type === 'user'
+                                    <div className={`p-3 md:p-4 rounded-2xl max-w-[85%] text-xs md:text-sm leading-relaxed shadow-sm ${msg.type === 'user'
                                         ? 'bg-green-600 text-white font-medium rounded-tr-none'
                                         : 'bg-white text-gray-800 font-medium rounded-tl-none border border-gray-100 shadow-sm'
                                         }`}>
@@ -171,13 +171,13 @@ const GeneralChat = () => {
                         </AnimatePresence>
 
                         {loading && (
-                            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center gap-3">
-                                <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
-                                    <Bot size={16} className="text-primary-green" />
+                            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center gap-2 md:gap-3">
+                                <div className="w-6 h-6 md:w-8 md:h-8 rounded-full bg-gray-100 flex items-center justify-center">
+                                    <Bot size={14} className="text-primary-green md:w-4 md:h-4" />
                                 </div>
-                                <div className="bg-white px-4 py-3 rounded-2xl rounded-tl-none shadow-sm border border-gray-100 flex items-center gap-2">
-                                    <Loader2 size={16} className="animate-spin text-primary-green" />
-                                    <span className="text-xs text-gray-400">Thinking...</span>
+                                <div className="bg-white px-3 py-2 md:px-4 md:py-3 rounded-2xl rounded-tl-none shadow-sm border border-gray-100 flex items-center gap-2">
+                                    <Loader2 size={14} className="animate-spin text-primary-green md:w-4 md:h-4" />
+                                    <span className="text-[10px] md:text-xs text-gray-400">Thinking...</span>
                                 </div>
                             </motion.div>
                         )}
@@ -186,25 +186,40 @@ const GeneralChat = () => {
                 </div>
 
                 {/* Input Area - Fixed at bottom on mobile to avoid nav overlap */}
-                <div className="fixed bottom-[4.5rem] left-0 right-0 p-4 bg-gradient-to-t from-white via-white to-transparent md:static md:bg-none md:p-0 z-40">
+                <div className="fixed bottom-20 left-0 right-0 px-2 py-2 md:py-4 bg-gradient-to-t from-white via-white to-transparent md:static md:bg-none md:p-0 z-[60]">
                     <form onSubmit={handleSend} className="relative flex items-center gap-2 max-w-4xl mx-auto w-full">
-                        <input
-                            type="text"
-                            value={input}
-                            onChange={(e) => setInput(e.target.value)}
-                            placeholder={isListening ? "Listening..." : "Type your question..."}
-                            className={`flex-1 h-12 md:h-14 pl-6 pr-4 bg-white rounded-full shadow-lg border transition-all font-sans ${isListening
-                                ? 'border-red-400 ring-2 ring-red-200'
-                                : 'border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary-green/50'
-                                }`}
-                        />
+                        <div className="relative flex-1 min-w-0">
+                            <input
+                                type="text"
+                                value={input}
+                                onChange={(e) => setInput(e.target.value)}
+                                placeholder={isListening ? "Listening..." : "Type your question..."}
+                                className={`w-full h-9 md:h-14 pl-3 md:pl-6 pr-8 md:pr-4 bg-white rounded-full shadow-lg border transition-all font-sans text-sm md:text-base ${isListening
+                                    ? 'border-red-400 ring-2 ring-red-200'
+                                    : 'border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary-green/50'
+                                    }`}
+                            />
+                            {/* Voice Button Mobile (Inside Input) */}
+                            {speechSupported && (
+                                <button
+                                    type="button"
+                                    onClick={toggleListening}
+                                    className={`absolute right-1 top-1/2 -translate-y-1/2 p-1.5 rounded-full md:hidden transition-all ${isListening
+                                        ? 'text-red-500 animate-pulse bg-red-50'
+                                        : 'text-gray-400 hover:text-gray-600'
+                                        }`}
+                                >
+                                    {isListening ? <MicOff size={16} /> : <Mic size={16} />}
+                                </button>
+                            )}
+                        </div>
 
-                        {/* Voice Button */}
+                        {/* Voice Button Desktop */}
                         {speechSupported && (
                             <button
                                 type="button"
                                 onClick={toggleListening}
-                                className={`h-12 w-12 rounded-full flex items-center justify-center transition-all shrink-0 shadow-lg ${isListening
+                                className={`hidden md:flex h-12 w-12 rounded-full items-center justify-center transition-all shrink-0 shadow-lg ${isListening
                                     ? 'bg-red-500 text-white animate-pulse'
                                     : 'bg-white text-gray-600 hover:bg-gray-50 border border-gray-100'
                                     }`}
@@ -217,9 +232,9 @@ const GeneralChat = () => {
                         <button
                             type="submit"
                             disabled={!input.trim() || loading}
-                            className="h-12 w-12 bg-gray-900 rounded-full flex items-center justify-center text-white hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shrink-0 shadow-lg"
+                            className="h-9 w-9 md:h-12 md:w-12 bg-black rounded-full flex items-center justify-center text-white hover:bg-gray-900 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shrink-0 shadow-lg"
                         >
-                            <Send size={20} />
+                            <Send size={16} className="md:w-5 md:h-5" />
                         </button>
                     </form>
                 </div>
