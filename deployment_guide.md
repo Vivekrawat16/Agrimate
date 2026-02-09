@@ -119,3 +119,17 @@ sudo systemctl restart nginx
 
 ## Verification
 Visit `http://your-ec2-ip` in your browser. You should see the Agrimat application running!
+
+## Troubleshooting
+
+### "Permission denied" during build
+If you see `EACCES: permission denied` when running `npm run build`, it means the `dist` folder was likely created by `root` (via sudo) previously.
+
+**Fix:**
+```bash
+sudo chown -R $USER:$USER ~/Agrimate
+```
+Then try building again:
+```bash
+npm run build
+```

@@ -158,7 +158,7 @@ const CropRecommendation = () => {
             <Navbar />
 
             {/* Chat Area */}
-            <div className="flex-1 container mx-auto px-4 pt-24 pb-24 max-w-2xl">
+            <div className="flex-1 container mx-auto px-4 pt-24 pb-48 md:pb-24 max-w-2xl">
                 <div className="space-y-6">
                     <AnimatePresence>
                         {messages.map((msg, index) => (
@@ -241,7 +241,7 @@ const CropRecommendation = () => {
             </div>
 
             {/* Input Bar */}
-            <div className="fixed bottom-0 w-full bg-white border-t border-gray-100 p-4 pb-6 z-40">
+            <div className="fixed bottom-[4.5rem] md:bottom-0 w-full bg-white border-t border-gray-100 p-4 pb-6 z-40 transition-all duration-300">
 
                 {/* Suggestion Chips */}
                 {!loading && !isTyping && step < questions.length && questions[step].options?.length > 0 && (

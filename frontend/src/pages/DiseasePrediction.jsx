@@ -102,7 +102,7 @@ const DiseasePrediction = () => {
         <div className="min-h-screen bg-light-bg flex flex-col">
             <Navbar />
 
-            <div className="flex-1 container mx-auto px-4 pt-24 pb-24 max-w-2xl">
+            <div className="flex-1 container mx-auto px-4 pt-24 pb-48 md:pb-24 max-w-2xl">
                 <div className="space-y-6">
                     <AnimatePresence>
                         {messages.map((msg, index) => (
@@ -166,7 +166,7 @@ const DiseasePrediction = () => {
                 </div>
             </div>
 
-            <div className="fixed bottom-0 w-full bg-white border-t border-gray-100 p-4 pb-6 z-40">
+            <div className="fixed bottom-[4.5rem] md:bottom-0 w-full bg-white border-t border-gray-100 p-4 pb-6 z-40 transition-all duration-300">
                 {!loading && !isTyping && step < questions.length && questions[step].options?.length > 0 && (
                     <div className="container mx-auto max-w-2xl px-2 mb-3 flex gap-2 overflow-x-auto no-scrollbar py-1">
                         {questions[step].options.map((opt, idx) => (

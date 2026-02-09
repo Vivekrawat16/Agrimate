@@ -146,7 +146,7 @@ const GeneralChat = () => {
 
                 {/* Chat Area */}
                 <div className="flex-1 bg-white rounded-3xl shadow-soft p-4 overflow-y-auto mb-4 border border-gray-100 relative">
-                    <div className="space-y-4 pb-20">
+                    <div className="space-y-4 pb-48 md:pb-20">
                         <AnimatePresence>
                             {messages.map((msg, index) => (
                                 <motion.div
@@ -185,42 +185,44 @@ const GeneralChat = () => {
                     </div>
                 </div>
 
-                {/* Input Area */}
-                <form onSubmit={handleSend} className="relative flex items-center gap-2">
-                    <input
-                        type="text"
-                        value={input}
-                        onChange={(e) => setInput(e.target.value)}
-                        placeholder={isListening ? "Listening..." : "Type your question..."}
-                        className={`flex-1 h-14 pl-6 pr-4 bg-white rounded-full shadow-hover border transition-all font-sans ${isListening
-                            ? 'border-red-400 ring-2 ring-red-200'
-                            : 'border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary-green/50'
-                            }`}
-                    />
-
-                    {/* Voice Button */}
-                    {speechSupported && (
-                        <button
-                            type="button"
-                            onClick={toggleListening}
-                            className={`h-12 w-12 rounded-full flex items-center justify-center transition-all shrink-0 ${isListening
-                                ? 'bg-red-500 text-white animate-pulse'
-                                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                {/* Input Area - Fixed at bottom on mobile to avoid nav overlap */}
+                <div className="fixed bottom-[4.5rem] left-0 right-0 p-4 bg-gradient-to-t from-white via-white to-transparent md:static md:bg-none md:p-0 z-40">
+                    <form onSubmit={handleSend} className="relative flex items-center gap-2 max-w-4xl mx-auto w-full">
+                        <input
+                            type="text"
+                            value={input}
+                            onChange={(e) => setInput(e.target.value)}
+                            placeholder={isListening ? "Listening..." : "Type your question..."}
+                            className={`flex-1 h-12 md:h-14 pl-6 pr-4 bg-white rounded-full shadow-lg border transition-all font-sans ${isListening
+                                ? 'border-red-400 ring-2 ring-red-200'
+                                : 'border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary-green/50'
                                 }`}
-                        >
-                            {isListening ? <MicOff size={20} /> : <Mic size={20} />}
-                        </button>
-                    )}
+                        />
 
-                    {/* Send Button */}
-                    <button
-                        type="submit"
-                        disabled={!input.trim() || loading}
-                        className="h-12 w-12 bg-gray-900 rounded-full flex items-center justify-center text-white hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
-                    >
-                        <Send size={20} />
-                    </button>
-                </form>
+                        {/* Voice Button */}
+                        {speechSupported && (
+                            <button
+                                type="button"
+                                onClick={toggleListening}
+                                className={`h-12 w-12 rounded-full flex items-center justify-center transition-all shrink-0 shadow-lg ${isListening
+                                    ? 'bg-red-500 text-white animate-pulse'
+                                    : 'bg-white text-gray-600 hover:bg-gray-50 border border-gray-100'
+                                    }`}
+                            >
+                                {isListening ? <MicOff size={20} /> : <Mic size={20} />}
+                            </button>
+                        )}
+
+                        {/* Send Button */}
+                        <button
+                            type="submit"
+                            disabled={!input.trim() || loading}
+                            className="h-12 w-12 bg-gray-900 rounded-full flex items-center justify-center text-white hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shrink-0 shadow-lg"
+                        >
+                            <Send size={20} />
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
     );
