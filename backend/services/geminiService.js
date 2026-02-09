@@ -1,25 +1,50 @@
-const { GoogleGenerativeAI } = require("@google/generative-ai");
 const AiCache = require('../models/AiCache');
 const crypto = require('crypto');
+const mongoose = require('mongoose');
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
+const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
 
 const generateHash = (data) => {
     return crypto.createHash('sha256').update(JSON.stringify(data)).digest('hex');
 };
 
-const getGeminiResponse = async (prompt, systemInstruction = "", retries = 1) => {
-    const model = genAI.getGenerativeModel({
-        model: "gemini-1.0-pro",
-        generationConfig: { responseMimeType: "application/json" }
-    });
+const getAIResponse = async (prompt, systemInstruction = "", retries = 3) => {
+    const messages = [];
+
+    if (systemInstruction) {
+        messages.push({ role: "system", content: systemInstruction });
+    }
+    messages.push({ role: "user", content: prompt });
 
     for (let attempt = 1; attempt <= retries; attempt++) {
         try {
-            const result = await model.generateContent(systemInstruction + "\n" + prompt);
-            const response = await result.response;
-            let text = response.text();
-            console.log("Raw Gemini Response:", text);
+            console.log("Fetching from OpenRouter...");
+
+            const response = await fetch(OPENROUTER_URL, {
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
+                    "Content-Type": "application/json",
+                    "HTTP-Referer": "http://localhost:5000",
+                    "X-Title": "Agrimate"
+                },
+                body: JSON.stringify({
+                    model: "google/gemini-2.0-flash-001",
+                    messages: messages,
+                    response_format: { type: "json_object" }
+                })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.text();
+                throw new Error(`OpenRouter API error (${response.status}): ${errorData}`);
+            }
+
+            const data = await response.json();
+            let text = data.choices[0]?.message?.content || "";
+
+            console.log("Raw OpenRouter Response:", text);
 
             // Sanitize JSON
             text = text.replace(/```json|```/g, '').trim();
@@ -27,20 +52,26 @@ const getGeminiResponse = async (prompt, systemInstruction = "", retries = 1) =>
             try {
                 return JSON.parse(text);
             } catch (parseError) {
-                console.error("Gemini returned invalid JSON:", text);
+                console.error("AI returned invalid JSON:", text);
                 throw new Error("Invalid JSON response from AI");
             }
         } catch (error) {
-            console.error(`Gemini API Error (Attempt ${attempt}/${retries}):`, error.message);
+            console.error(`OpenRouter API Error (Attempt ${attempt}/${retries}):`, error.message);
 
-            const isRetryable = error.message.includes('429') || error.message.includes('503');
+            // Retry on rate limits, server errors, or network failures
+            const isRetryable = error.message.includes('429') ||
+                error.message.includes('503') ||
+                error.message.includes('fetch failed') ||
+                error.message.includes('ECONNRESET') ||
+                error.message.includes('ETIMEDOUT');
+
             if (isRetryable && attempt < retries) {
-                const delay = 1500; // Fixed short delay for faster feedback
+                const delay = 2000 * attempt;
                 console.log(`Retrying in ${delay}ms...`);
                 await new Promise(res => setTimeout(res, delay));
             } else {
                 logError(error);
-                throw new Error("Failed to fetch response from Gemini: " + error.message);
+                throw new Error("AI Service Error: " + error.message);
             }
         }
     }
@@ -60,10 +91,7 @@ const logError = (error) => {
     }
 };
 
-const mongoose = require('mongoose');
-
 const getCachedOrFreshResponse = async (promptData, promptTemplate, cacheKeyIdentifier) => {
-    // Create a consistent hash based on the identifier (e.g., all inputs)
     const promptHash = generateHash(promptData);
 
     // Check Cache
@@ -79,72 +107,17 @@ const getCachedOrFreshResponse = async (promptData, promptTemplate, cacheKeyIden
         console.warn("Cache lookup failed, skipping cache:", dbError.message);
     }
 
-    // If not in cache, call Gemini
-    // If not in cache, call Gemini
-    console.log("Fetching from Gemini");
+    // If not in cache, call AI
+    console.log("Fetching from AI");
     let aiResponse;
     try {
-        aiResponse = await getGeminiResponse(promptTemplate);
+        aiResponse = await getAIResponse(promptTemplate);
     } catch (error) {
-        console.warn("Falling back to MOCK DATA due to API error:", error.message);
-
-        // Dynamic Mock Responses based on input data (promptData)
-        if (cacheKeyIdentifier === 'crop-recommendation') {
-            const soil = promptData?.soil?.toLowerCase() || "";
-            const season = promptData?.season?.toLowerCase() || "";
-
-            let crops = [];
-            if (soil.includes("red")) {
-                crops.push({ name: "Groundnut", reason: "Red soil is ideal for groundnut cultivation.", expected_profit: "High", water_requirement: "Moderate", growth_duration: "100-120 days" });
-                crops.push({ name: "Cotton", reason: "Suitable for red soil with good drainage.", expected_profit: "High", water_requirement: "High", growth_duration: "150-160 days" });
-            } else if (soil.includes("black")) {
-                crops.push({ name: "Soybean", reason: "Black soil retains moisture well.", expected_profit: "Medium", water_requirement: "Moderate", growth_duration: "90-100 days" });
-                crops.push({ name: "Wheat", reason: "Excellent yield in black soil during Rabi.", expected_profit: "High", water_requirement: "Moderate", growth_duration: "120 days" });
-            } else {
-                // Default fallback
-                crops.push({ name: "Maize", reason: "Versatile crop for strictly testing.", expected_profit: "Medium", water_requirement: "Moderate", growth_duration: "110 days" });
-                crops.push({ name: "Sorghum", reason: "Drought resistant fallback option.", expected_profit: "Low", water_requirement: "Low", growth_duration: "100 days" });
-            }
-
-            aiResponse = { recommended_crops: crops };
-
-        } else if (cacheKeyIdentifier === 'yield-prediction') {
-            const landSize = parseFloat(promptData?.landSize) || 1;
-            const baseYield = 20 * landSize; // generic calculation
-
-            aiResponse = {
-                estimated_yield: `${baseYield}`,
-                yield_unit: "quintals",
-                best_case: `${baseYield * 1.2} quintals`,
-                worst_case: `${baseYield * 0.8} quintals`,
-                tips_to_increase_yield: [
-                    "Ensure timely irrigation based on soil moisture.",
-                    "Apply NPK fertilizer in split doses."
-                ]
-            };
-        } else if (cacheKeyIdentifier === 'disease-prediction') {
-            aiResponse = {
-                possible_diseases: [
-                    {
-                        name: "Leaf Spot",
-                        confidence: "85%",
-                        treatment: "Spray Mancozeb 75 WP @ 2g/liter.",
-                        organic_solution: "Spray Neem oil (3%).",
-                        chemical_solution: "Carbendazim 50 WP.",
-                        urgency_level: "High"
-                    }
-                ]
-            };
-        } else if (cacheKeyIdentifier === 'chat-agent') {
-            aiResponse = {
-                answer: "I am having trouble connecting to the cloud right now. Please check your internet connection or API key. In the meantime, remember that good soil preparation is key to a bountiful harvest!"
-            };
-        } else {
-            throw error; // Re-throw if unknown identifier
-        }
+        console.error("AI API Error:", error.message);
+        throw new Error(`AI Service Error: ${error.message}`);
     }
 
-    // Save to Cache (Fire and forget)
+    // Save to Cache
     try {
         if (mongoose.connection.readyState === 1) {
             AiCache.create({

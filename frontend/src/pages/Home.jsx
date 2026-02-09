@@ -1,41 +1,199 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { CloudRain, TrendingUp, Sprout, Bug, Bot, Mic, ArrowRight } from 'lucide-react';
+import { TrendingUp, Sprout, Bug, ArrowRight, MapPin, Droplets, Wind, Sun, Loader2, RefreshCw, CloudRain, Thermometer, Calendar, Leaf } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import AIInput from '../components/AIInput';
-import VoiceButton from '../components/VoiceButton';
-import BentoGrid, { BentoItem } from '../components/BentoGrid';
 import GlassCard from '../components/GlassCard';
 import { useLanguage } from '../context/LanguageContext';
+import { getWeatherForecast } from '../services/api';
 
 const Home = () => {
     const navigate = useNavigate();
     const { t } = useLanguage();
 
-    return (
-        <div className="min-h-screen bg-[#F2F4F3] selection:bg-green-100 selection:text-primary-green relative overflow-hidden">
-            {/* Background Decor */}
-            <div className="absolute top-0 left-0 w-full h-[500px] bg-gradient-to-b from-green-50/80 to-transparent pointer-events-none" />
+    // Weather state
+    const [weather, setWeather] = useState(null);
+    const [weatherLoading, setWeatherLoading] = useState(true);
+    const [weatherError, setWeatherError] = useState('');
 
+    // Fetch weather on mount
+    useEffect(() => {
+        fetchWeatherByLocation();
+    }, []);
+
+    const fetchWeatherByLocation = () => {
+        setWeatherLoading(true);
+        setWeatherError('');
+
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                async (position) => {
+                    const { latitude, longitude } = position.coords;
+                    try {
+                        const { data } = await getWeatherForecast(`${latitude},${longitude}`, 5);
+                        setWeather(data);
+                    } catch (err) {
+                        setWeatherError('Could not load weather');
+                    } finally {
+                        setWeatherLoading(false);
+                    }
+                },
+                async () => {
+                    try {
+                        const { data } = await getWeatherForecast('New Delhi', 5);
+                        setWeather(data);
+                    } catch (err) {
+                        setWeatherError('Could not load weather');
+                    } finally {
+                        setWeatherLoading(false);
+                    }
+                }
+            );
+        } else {
+            getWeatherForecast('New Delhi', 5)
+                .then(({ data }) => setWeather(data))
+                .catch(() => setWeatherError('Could not load weather'))
+                .finally(() => setWeatherLoading(false));
+        }
+    };
+
+    const getWeatherIcon = (code) => {
+        if (code === 1000) return '☀️';
+        if (code >= 1003 && code <= 1009) return '⛅';
+        if (code >= 1030 && code <= 1135) return '🌫️';
+        if (code >= 1150 && code <= 1201) return '🌧️';
+        if (code >= 1204 && code <= 1237) return '🌨️';
+        if (code >= 1240 && code <= 1282) return '⛈️';
+        return '🌤️';
+    };
+
+    const today = new Date();
+    const dateStr = today.toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+
+    return (
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-green-50/30 to-sky-50/30">
             <Navbar />
 
-            <div className="container mx-auto px-4 pt-28 pb-32 max-w-6xl relative z-10">
+            <div className="container mx-auto px-4 pt-20 pb-12 max-w-7xl">
 
-                {/* 1. Hero / AI Command Center */}
-                <div className="text-center mb-16 max-w-3xl mx-auto">
-                    <div className="inline-flex items-center justify-center space-x-2 bg-white/60 backdrop-blur-sm border border-green-100 rounded-full px-4 py-1.5 mb-6 text-sm font-medium text-green-800 shadow-sm animate-fade-in-up">
-                        <span className="relative flex h-2 w-2">
-                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                            <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
-                        </span>
-                        <span>{t('home.heroTitle')}</span>
+                {/* Dashboard Header */}
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 mt-4">
+                    <div>
+                        <h1 className="text-2xl md:text-3xl font-bold text-gray-900">🌾 Farmer Dashboard</h1>
+                        <p className="text-gray-500 flex items-center gap-2 mt-1">
+                            <Calendar size={14} />
+                            {dateStr}
+                        </p>
                     </div>
+                    <div className="mt-4 md:mt-0 flex items-center gap-2">
+                        {weather && (
+                            <div className="flex items-center gap-2 bg-white rounded-full px-4 py-2 shadow-sm border border-gray-100">
+                                <MapPin size={14} className="text-gray-400" />
+                                <span className="text-sm text-gray-700">{weather.location?.name}, {weather.location?.region}</span>
+                            </div>
+                        )}
+                    </div>
+                </div>
 
-                    <h1 className="text-5xl md:text-6xl font-bold text-text-dark tracking-tight mb-6 leading-tight">
-                        {t('home.heroSubtitle')}
-                    </h1>
+                {/* Weather Section - Prominent at Top */}
+                <div className="mb-8">
+                    {weatherLoading ? (
+                        <div className="bg-gradient-to-r from-sky-500 to-blue-600 rounded-3xl p-8 flex items-center justify-center">
+                            <Loader2 className="animate-spin text-white" size={40} />
+                        </div>
+                    ) : weatherError ? (
+                        <div className="bg-gradient-to-r from-sky-500 to-blue-600 rounded-3xl p-8 text-center text-white">
+                            <CloudRain size={40} className="mx-auto mb-2 opacity-50" />
+                            <p>{weatherError}</p>
+                            <button onClick={fetchWeatherByLocation} className="mt-3 bg-white/20 px-4 py-2 rounded-full text-sm hover:bg-white/30 transition">
+                                Retry
+                            </button>
+                        </div>
+                    ) : weather && (
+                        <div className="relative overflow-hidden rounded-3xl shadow-xl text-white bg-gradient-to-r from-sky-500 via-blue-500 to-indigo-500">
+                            {/* Decorative Elements */}
+                            <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl pointer-events-none" />
+                            <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/10 rounded-full translate-y-1/2 -translate-x-1/2 blur-2xl pointer-events-none" />
 
-                    <div className="relative z-20 mb-8">
+                            <div className="relative z-10 p-5 md:p-8">
+                                {/* Top Row - Current Weather */}
+                                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 md:gap-6 mb-4 md:mb-6">
+                                    <div className="flex items-center gap-4 md:gap-6">
+                                        <div className="text-5xl md:text-8xl">
+                                            {getWeatherIcon(weather.current?.condition?.code)}
+                                        </div>
+                                        <div>
+                                            <div className="text-4xl md:text-7xl font-light">
+                                                {Math.round(weather.current?.temp_c)}°
+                                                <span className="text-lg md:text-2xl text-white/60 ml-1">C</span>
+                                            </div>
+                                            <div className="text-white/90 text-sm md:text-lg mt-0.5 md:mt-1 font-medium">
+                                                {weather.current?.condition?.text}
+                                            </div>
+                                            <div className="text-white/70 text-xs md:text-sm">
+                                                Feels like {Math.round(weather.current?.feelslike_c)}°
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Weather Stats - Compact Grid on Mobile */}
+                                    <div className="grid grid-cols-4 gap-2 md:gap-4 mt-2 md:mt-0">
+                                        {[
+                                            { icon: Droplets, val: `${weather.current?.humidity}%`, label: 'Humidity', color: 'text-blue-200' },
+                                            { icon: Wind, val: Math.round(weather.current?.wind_kph), label: 'Wind', color: 'text-blue-200' },
+                                            { icon: Sun, val: weather.current?.uv, label: 'UV', color: 'text-yellow-300' },
+                                            { icon: CloudRain, val: weather.current?.precip_mm, label: 'Rain', color: 'text-blue-200' }
+                                        ].map((stat, i) => (
+                                            <div key={i} className="bg-white/10 backdrop-blur-sm rounded-xl p-2 md:p-4 text-center flex flex-col items-center justify-center">
+                                                <stat.icon size={16} className={`mb-1 ${stat.color} md:w-5 md:h-5`} />
+                                                <div className="text-sm md:text-2xl font-semibold leading-tight">{stat.val}</div>
+                                                <div className="text-[10px] md:text-xs text-white/60">{stat.label}</div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* 5-Day Forecast Row - Scrollable */}
+                                <div className="border-t border-white/20 pt-3 md:pt-4">
+                                    <div className="flex justify-between items-center overflow-x-auto gap-3 pb-1 no-scrollbar">
+                                        {weather.forecast?.forecastday?.map((day, i) => {
+                                            const date = new Date(day.date);
+                                            const dayName = i === 0 ? 'Today' : date.toLocaleDateString('en-US', { weekday: 'short' });
+                                            return (
+                                                <div key={i} className="flex-1 min-w-[60px] md:min-w-[80px] text-center bg-white/10 rounded-lg md:rounded-xl py-2 md:py-3 px-1 md:px-2 shrink-0">
+                                                    <div className="text-[10px] md:text-xs text-white/70 mb-1 uppercase tracking-wider">{dayName}</div>
+                                                    <div className="text-xl md:text-2xl my-1">{getWeatherIcon(day.day.condition.code)}</div>
+                                                    <div className="text-sm font-semibold">{Math.round(day.day.maxtemp_c)}°</div>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+
+                                {/* Refresh Button */}
+                                <button
+                                    onClick={fetchWeatherByLocation}
+                                    className="absolute top-3 right-3 md:top-4 md:right-4 p-2 bg-white/20 rounded-full hover:bg-white/30 transition-colors"
+                                >
+                                    <RefreshCw size={16} className="md:w-[18px] md:h-[18px]" />
+                                </button>
+                            </div>
+                        </div>
+                    )}
+                </div>
+
+                {/* AI Assistant Input */}
+                <div className="mb-8">
+                    <div className="bg-white rounded-2xl shadow-lg p-4 border border-gray-100">
+                        <div className="flex items-center gap-3 mb-3">
+                            <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
+                                <Leaf className="text-green-600" size={20} />
+                            </div>
+                            <div>
+                                <h3 className="font-semibold text-gray-800">Ask Agrimate AI</h3>
+                                <p className="text-xs text-gray-500">Get instant farming advice</p>
+                            </div>
+                        </div>
                         <AIInput
                             placeholder={t('home.inputPlaceholder')}
                             onSearch={(query) => navigate('/chat', { state: { query } })}
@@ -43,73 +201,80 @@ const Home = () => {
                     </div>
                 </div>
 
-                {/* 2. Feature Dashboard (Bento Grid) */}
-                <BentoGrid>
-                    {/* Main Feature: Yield Prediction (Large) */}
-                    <BentoItem colSpan={2} rowSpan={2}>
-                        <GlassCard className="h-full flex flex-col justify-between p-8 group cursor-pointer" onClick={() => navigate('/yield')}>
-                            <div>
-                                <div className="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 mb-4 group-hover:scale-110 transition-transform duration-300">
+                {/* Quick Actions Grid */}
+                <div className="mb-6">
+                    <h2 className="text-lg font-semibold text-gray-800 mb-4">Quick Actions</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+                        {/* Crop Recommendation */}
+                        <GlassCard
+                            className="p-6 cursor-pointer group hover:shadow-lg transition-all bg-gradient-to-br from-green-500 to-emerald-600 text-white"
+                            onClick={() => navigate('/crop')}
+                        >
+                            <div className="flex items-start justify-between">
+                                <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                                    <Sprout size={24} />
+                                </div>
+                                <ArrowRight size={20} className="opacity-50 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
+                            </div>
+                            <h3 className="text-xl font-bold mt-4">{t('home.cards.crop.title')}</h3>
+                            <p className="text-green-100 text-sm mt-1">{t('home.cards.crop.subtitle')}</p>
+                        </GlassCard>
+
+                        {/* Yield Prediction */}
+                        <GlassCard
+                            className="p-6 cursor-pointer group hover:shadow-lg transition-all bg-gradient-to-br from-blue-500 to-indigo-600 text-white"
+                            onClick={() => navigate('/yield')}
+                        >
+                            <div className="flex items-start justify-between">
+                                <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
                                     <TrendingUp size={24} />
                                 </div>
-                                <h3 className="text-2xl font-bold text-gray-900 mb-2">{t('home.cards.yield.title')}</h3>
-                                <p className="text-gray-500 leading-relaxed">{t('home.cards.yield.subtitle')}</p>
+                                <ArrowRight size={20} className="opacity-50 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
                             </div>
-                            <div className="mt-8 flex items-center text-blue-600 font-semibold group-hover:gap-2 transition-all">
-                                <span>Start Analysis</span> <ArrowRight size={18} />
-                            </div>
-                            {/* Decorative Graph Line */}
-                            <div className="absolute bottom-0 right-0 w-1/2 h-24 bg-gradient-to-t from-blue-50/50 to-transparent pointer-events-none" />
+                            <h3 className="text-xl font-bold mt-4">{t('home.cards.yield.title')}</h3>
+                            <p className="text-blue-100 text-sm mt-1">{t('home.cards.yield.subtitle')}</p>
                         </GlassCard>
-                    </BentoItem>
 
-                    {/* Secondary: Crop Recommendation (Tall) */}
-                    <BentoItem rowSpan={2}>
-                        <GlassCard className="h-full p-8 bg-gradient-to-br from-green-600 to-green-700 text-white cursor-pointer group" onClick={() => navigate('/crop')}>
-                            <div className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center text-white mb-6 group-hover:rotate-12 transition-transform duration-500">
-                                <Sprout size={24} />
-                            </div>
-                            <h3 className="text-xl font-bold mb-2">{t('home.cards.crop.title')}</h3>
-                            <p className="text-green-100 opacity-90 text-sm mb-8">{t('home.cards.crop.subtitle')}</p>
-
-                            <div className="absolute bottom-4 right-4 bg-white/20 p-2 rounded-full backdrop-blur-md group-hover:bg-white group-hover:text-green-600 transition-colors">
-                                <ArrowRight size={20} />
-                            </div>
-                        </GlassCard>
-                    </BentoItem>
-
-                    {/* Standard: Disease Doctor */}
-                    <BentoItem>
-                        <GlassCard className="h-full p-6 cursor-pointer group hover:bg-red-50/50 transition-colors border-l-4 border-l-red-500" onClick={() => navigate('/disease')}>
-                            <div className="flex items-start justify-between mb-4">
-                                <div className="w-10 h-10 bg-red-100 rounded-xl flex items-center justify-center text-red-600">
-                                    <Bug size={20} />
+                        {/* Disease Prediction */}
+                        <GlassCard
+                            className="p-6 cursor-pointer group hover:shadow-lg transition-all bg-gradient-to-br from-red-500 to-rose-600 text-white"
+                            onClick={() => navigate('/disease')}
+                        >
+                            <div className="flex items-start justify-between">
+                                <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                                    <Bug size={24} />
                                 </div>
-                                <span className="bg-red-100 text-red-700 text-xs px-2 py-1 rounded-full font-medium">AI Doctor</span>
+                                <ArrowRight size={20} className="opacity-50 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
                             </div>
-                            <h4 className="font-bold text-gray-900 text-lg">{t('home.cards.disease.title')}</h4>
-                            <p className="text-sm text-gray-500 mt-1">{t('home.cards.disease.subtitle')}</p>
+                            <h3 className="text-xl font-bold mt-4">{t('home.cards.disease.title')}</h3>
+                            <p className="text-red-100 text-sm mt-1">{t('home.cards.disease.subtitle')}</p>
                         </GlassCard>
-                    </BentoItem>
 
-                    {/* Standard: Weather */}
-                    <BentoItem>
-                        <GlassCard className="h-full p-6 cursor-pointer group hover:bg-sky-50/50 transition-colors" onClick={() => navigate('/weather')}>
-                            <div className="flex items-start justify-between mb-4">
-                                <div className="w-10 h-10 bg-sky-100 rounded-xl flex items-center justify-center text-sky-600">
-                                    <CloudRain size={20} />
+                    </div>
+                </div>
+
+                {/* Farming Tips from Weather */}
+                {weather?.insights && weather.insights.length > 0 && (
+                    <div>
+                        <h2 className="text-lg font-semibold text-gray-800 mb-4">🌾 Today's Farming Tips</h2>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            {weather.insights.map((insight, i) => (
+                                <div
+                                    key={i}
+                                    className={`p-4 rounded-xl border ${insight.type === 'warning' ? 'bg-yellow-50 border-yellow-200' :
+                                        insight.type === 'success' ? 'bg-green-50 border-green-200' :
+                                            'bg-blue-50 border-blue-200'
+                                        }`}
+                                >
+                                    <p className="text-sm text-gray-700">{insight.message}</p>
                                 </div>
-                                <span className="text-sky-600 font-bold text-xl">24°C</span>
-                            </div>
-                            <h4 className="font-bold text-gray-900 text-lg">{t('home.cards.weather.title')}</h4>
-                            <p className="text-sm text-gray-500 mt-1">{t('home.cards.weather.subtitle')}</p>
-                        </GlassCard>
-                    </BentoItem>
+                            ))}
+                        </div>
+                    </div>
+                )}
 
-                </BentoGrid>
             </div>
-
-            <VoiceButton />
         </div>
     );
 };

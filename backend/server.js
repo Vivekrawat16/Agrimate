@@ -16,10 +16,24 @@ app.use(express.json());
 
 // Routes
 app.use('/api/ai', require('./routes/aiRoutes'));
+app.use('/api/weather', require('./routes/weatherRoutes'));
 
-app.get('/', (req, res) => {
-    res.send('AgriSense AI API is running...');
-});
+// Serve static assets in production
+const path = require('path');
+
+// Serve static assets if in production
+if (process.env.NODE_ENV === 'production') {
+    // Set static folder
+    app.use(express.static(path.join(__dirname, '../frontend/dist')));
+
+    app.get('*', (req, res) => {
+        res.sendFile(path.resolve(__dirname, '../frontend', 'dist', 'index.html'));
+    });
+} else {
+    app.get('/', (req, res) => {
+        res.send('AgriSense AI API is running... (Development Mode)');
+    });
+}
 
 // Error Handling Middleware
 app.use(require('./middleware/errorMiddleware').errorHandler);

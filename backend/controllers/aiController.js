@@ -49,10 +49,14 @@ JSON Format:
 const chatAgent = asyncHandler(async (req, res) => {
     const { query, history } = req.body;
     // Construct prompt with history context if needed
-    const prompt = `You are an expert agriculture assistant named Agrimate. Answer the user's question politely and accurately. Return strictly valid JSON.
-    User Query: "${query}"
-    Answer should be in concise markdown format inside the JSON.
-    Schema: { "answer": "Markdown string here" }`;
+    const prompt = `You are Agrimate, an expert agriculture assistant. You ONLY answer questions related to agriculture, farming, crops, soil, weather for farming, irrigation, pests, diseases, seeds, fertilizers, livestock, and related farming topics.
+
+If the user asks about anything NOT related to agriculture or farming, politely decline and say: "I'm Agrimate, your agriculture assistant. I can only help with farming-related questions. Please ask me about crops, soil, weather, irrigation, or other agricultural topics!"
+
+User Query: "${query}"
+
+Return strictly valid JSON with your answer in concise markdown format.
+Schema: { "answer": "Your response here" }`;
 
     const response = await getCachedOrFreshResponse({ query }, prompt, 'chat-agent');
     res.json(response);

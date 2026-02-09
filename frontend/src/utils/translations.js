@@ -3,7 +3,12 @@ export const translations = {
         nav: {
             brand: "Agrimate AI",
             connected: "Connected",
-            language: "English"
+            language: "English",
+            dashboard: "Dashboard",
+            crop: "Crop",
+            yield: "Yield",
+            disease: "Disease",
+            chat: "Chat"
         },
         home: {
             heroTitle: "Agrimate AI Agent",
@@ -80,7 +85,12 @@ export const translations = {
         nav: {
             brand: "एग्रीमेट एआई",
             connected: "जुड़ा हुआ",
-            language: "हिन्दी"
+            language: "हिन्दी",
+            dashboard: "डैशबोर्ड",
+            crop: "फसल",
+            yield: "उपज",
+            disease: "रोग",
+            chat: "चैट"
         },
         home: {
             heroTitle: "एग्रीमेट एआई एजेंट",
@@ -157,7 +167,12 @@ export const translations = {
         nav: {
             brand: "अॅग्रीमेट एआय",
             connected: "जोडलेले",
-            language: "मराठी"
+            language: "मराठी",
+            dashboard: "डॅशबोर्ड",
+            crop: "पीक",
+            yield: "उत्पन्न",
+            disease: "रोग",
+            chat: "चॅट"
         },
         home: {
             heroTitle: "अॅग्रीमेट एआय एजंट",

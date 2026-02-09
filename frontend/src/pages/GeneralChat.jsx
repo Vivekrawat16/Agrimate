@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Send, Bot, User, Loader2, ArrowLeft } from 'lucide-react';
+import { Send, Bot, User, Loader2, ArrowLeft, Mic, MicOff } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { chatAgent } from '../services/api';
 import Navbar from '../components/Navbar';
@@ -17,21 +17,85 @@ const GeneralChat = () => {
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState('');
     const [loading, setLoading] = useState(false);
+    const [isListening, setIsListening] = useState(false);
+    const [speechSupported, setSpeechSupported] = useState(true);
     const messagesEndRef = useRef(null);
+    const recognitionRef = useRef(null);
 
-    const scrollToBottom = () => messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    const scrollToBottom = () => messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     useEffect(scrollToBottom, [messages]);
+
+    // Initialize Speech Recognition
+    useEffect(() => {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRecognition) {
+            setSpeechSupported(false);
+            return;
+        }
+
+        const recognition = new SpeechRecognition();
+        recognition.continuous = false;
+        recognition.interimResults = true;
+        recognition.lang = 'en-IN'; // Indian English, supports Hindi mixed
+
+        recognition.onresult = (event) => {
+            const transcript = Array.from(event.results)
+                .map(result => result[0].transcript)
+                .join('');
+            setInput(transcript);
+        };
+
+        recognition.onend = () => {
+            setIsListening(false);
+        };
+
+        recognition.onerror = (event) => {
+            console.error('Speech recognition error:', event.error);
+            setIsListening(false);
+        };
+
+        recognitionRef.current = recognition;
+
+        return () => {
+            if (recognitionRef.current) {
+                recognitionRef.current.stop();
+            }
+        };
+    }, []);
+
+    const toggleListening = () => {
+        if (!recognitionRef.current) return;
+
+        if (isListening) {
+            recognitionRef.current.stop();
+            setIsListening(false);
+        } else {
+            setInput(''); // Clear input when starting new voice input
+            recognitionRef.current.start();
+            setIsListening(true);
+        }
+    };
 
     useEffect(() => {
         // If there was an initial query, send it automatically
-        if (initialQuery && messages.length === 0) {
-            handleSend(null, initialQuery);
-        } else if (messages.length === 0) {
-            // Initial Greeting
-            setMessages([{
-                type: 'bot',
-                text: "Hello! I am your Agrimate Assistant. 🌾 Ask me anything about farming, weather, or market prices."
-            }]);
+        if (initialQuery) {
+            setMessages(prev => {
+                if (prev.length === 0) {
+                    handleSend(null, initialQuery);
+                }
+                return prev;
+            });
+        } else {
+            // Initial Greeting - functional update to prevent double render
+            setMessages(prev => {
+                if (prev.length === 0) {
+                    return [{
+                        type: 'bot',
+                        text: "Hello! I am your Agrimate Assistant. 🌾 Ask me anything about farming, weather, or market prices."
+                    }];
+                }
+                return prev;
+            });
         }
     }, []);
 
@@ -39,6 +103,12 @@ const GeneralChat = () => {
         if (e) e.preventDefault();
         const textToUse = textOverride || input;
         if (!textToUse.trim()) return;
+
+        // Stop listening if active
+        if (isListening && recognitionRef.current) {
+            recognitionRef.current.stop();
+            setIsListening(false);
+        }
 
         // User Message
         const userMsg = { type: 'user', text: textToUse };
@@ -116,20 +186,39 @@ const GeneralChat = () => {
                 </div>
 
                 {/* Input Area */}
-                <form onSubmit={handleSend} className="relative">
+                <form onSubmit={handleSend} className="relative flex items-center gap-2">
                     <input
                         type="text"
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
-                        placeholder="Type your question..."
-                        className="w-full h-14 pl-6 pr-14 bg-white rounded-full shadow-hover border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary-green/50 transition-all font-sans"
+                        placeholder={isListening ? "Listening..." : "Type your question..."}
+                        className={`flex-1 h-14 pl-6 pr-4 bg-white rounded-full shadow-hover border transition-all font-sans ${isListening
+                            ? 'border-red-400 ring-2 ring-red-200'
+                            : 'border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary-green/50'
+                            }`}
                     />
+
+                    {/* Voice Button */}
+                    {speechSupported && (
+                        <button
+                            type="button"
+                            onClick={toggleListening}
+                            className={`h-12 w-12 rounded-full flex items-center justify-center transition-all shrink-0 ${isListening
+                                ? 'bg-red-500 text-white animate-pulse'
+                                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                }`}
+                        >
+                            {isListening ? <MicOff size={20} /> : <Mic size={20} />}
+                        </button>
+                    )}
+
+                    {/* Send Button */}
                     <button
                         type="submit"
                         disabled={!input.trim() || loading}
-                        className="absolute right-2 top-2 h-10 w-10 bg-primary-green rounded-full flex items-center justify-center text-white hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="h-12 w-12 bg-gray-900 rounded-full flex items-center justify-center text-white hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
                     >
-                        <Send size={18} />
+                        <Send size={20} />
                     </button>
                 </form>
             </div>

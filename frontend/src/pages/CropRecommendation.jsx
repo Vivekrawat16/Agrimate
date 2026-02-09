@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { recommendCrop } from '../services/api';
 import Navbar from '../components/Navbar';
-import { Send, Bot, User, Loader2, Leaf, Droplets, DollarSign, Clock } from 'lucide-react';
+import { Send, Bot, User, Loader2, Leaf, Droplets, DollarSign, Clock, Mic, MicOff } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-
+import useVoiceInput from '../hooks/useVoiceInput';
 import { useLanguage } from '../context/LanguageContext';
 
 const CropRecommendation = () => {
@@ -29,22 +29,31 @@ const CropRecommendation = () => {
     const [input, setInput] = useState('');
     const [loading, setLoading] = useState(false);
     const [isTyping, setIsTyping] = useState(false);
+    const { isListening, speechSupported, transcript, toggleListening } = useVoiceInput();
+
+    // Sync voice transcript to input
+    useEffect(() => {
+        if (transcript) setInput(transcript);
+    }, [transcript]);
 
     const messagesEndRef = useRef(null);
 
     const scrollToBottom = () => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     };
 
     useEffect(() => {
         scrollToBottom();
     }, [messages, isTyping]);
 
-    // Initial greeting
+    // Initial greeting - runs only once
     useEffect(() => {
-        if (messages.length === 0) {
-            simulateBotResponse(questions[0].text);
-        }
+        setMessages(prevMessages => {
+            if (prevMessages.length === 0) {
+                return [{ type: 'bot', text: questions[0].text }];
+            }
+            return prevMessages;
+        });
     }, []);
 
     const simulateBotResponse = (text, delay = 600) => {
@@ -253,21 +262,30 @@ const CropRecommendation = () => {
                     </div>
                 )}
 
-                <form onSubmit={handleSend} className="container mx-auto max-w-2xl relative">
+                <form onSubmit={handleSend} className="container mx-auto max-w-2xl flex items-center gap-2">
                     <input
                         type="text"
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
-                        placeholder="Type or select..."
-                        className="w-full h-14 pl-6 pr-16 bg-gray-50 rounded-full text-lg text-black border-transparent focus:border-green-500/30 focus:bg-white focus:ring-4 focus:ring-green-500/10 transition-all outline-none placeholder:text-gray-400"
+                        placeholder={isListening ? "Listening..." : "Type or select..."}
+                        className={`flex-1 h-14 pl-6 pr-4 bg-gray-50 rounded-full text-lg text-black transition-all outline-none placeholder:text-gray-400 ${isListening ? 'border-2 border-red-400 ring-2 ring-red-200' : 'border-transparent focus:border-green-500/30 focus:bg-white focus:ring-4 focus:ring-green-500/10'}`}
                         disabled={loading || isTyping}
                         autoFocus
                     />
+                    {speechSupported && (
+                        <button
+                            type="button"
+                            onClick={toggleListening}
+                            className={`h-12 w-12 rounded-full flex items-center justify-center transition-all shrink-0 ${isListening ? 'bg-red-500 text-white animate-pulse' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+                        >
+                            {isListening ? <MicOff size={20} /> : <Mic size={20} />}
+                        </button>
+                    )}
                     <button
                         id="chat-submit-btn"
                         type="submit"
                         disabled={!input.trim() || loading || isTyping}
-                        className="absolute right-2 top-2 h-10 w-10 bg-primary-green rounded-full flex items-center justify-center text-white disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105 transition-transform"
+                        className="h-12 w-12 bg-gray-900 rounded-full flex items-center justify-center text-white disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-800 transition-colors shrink-0"
                     >
                         {loading ? <Loader2 size={20} className="animate-spin" /> : <Send size={20} />}
                     </button>
