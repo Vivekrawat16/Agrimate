@@ -16,7 +16,7 @@ const Navbar = () => {
     ];
 
     const navLinks = [
-        { path: '/', labelKey: 'nav.dashboard', icon: Home },
+        { path: '/home', labelKey: 'nav.dashboard', icon: Home },
         { path: '/crop', labelKey: 'nav.crop', icon: Sprout },
         { path: '/yield', labelKey: 'nav.yield', icon: TrendingUp },
         { path: '/disease', labelKey: 'nav.disease', icon: Bug },
@@ -28,7 +28,7 @@ const Navbar = () => {
     return (
         <nav className="fixed top-0 w-full bg-white/95 backdrop-blur-md shadow-sm h-16 z-50 flex items-center justify-between px-4 md:px-6">
             {/* Left: Branding */}
-            <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate('/')}>
+            <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate('/home')}>
                 <div className="w-8 h-8 bg-primary-green rounded-lg flex items-center justify-center text-white font-bold">A</div>
                 <span className="text-text-dark font-sans font-bold text-lg tracking-tight hidden sm:block">{t('nav.brand')}</span>
             </div>

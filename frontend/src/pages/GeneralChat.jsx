@@ -9,7 +9,7 @@ import { useLanguage } from '../context/LanguageContext';
 const GeneralChat = () => {
     const { state } = useLocation();
     const navigate = useNavigate();
-    const { t } = useLanguage();
+    const { t, language } = useLanguage();
 
     // Initial message from Home page input, if any
     const initialQuery = state?.query || '';
@@ -22,8 +22,13 @@ const GeneralChat = () => {
     const messagesEndRef = useRef(null);
     const recognitionRef = useRef(null);
 
-    const scrollToBottom = () => messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    useEffect(scrollToBottom, [messages]);
+    const scrollToBottom = () => {
+        setTimeout(() => {
+            messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+        }, 100);
+    };
+
+    useEffect(scrollToBottom, [messages, loading]);
 
     // Initialize Speech Recognition
     useEffect(() => {
@@ -36,7 +41,7 @@ const GeneralChat = () => {
         const recognition = new SpeechRecognition();
         recognition.continuous = false;
         recognition.interimResults = true;
-        recognition.lang = 'en-IN'; // Indian English, supports Hindi mixed
+        recognition.lang = language === 'hi' ? 'hi-IN' : language === 'mr' ? 'mr-IN' : 'en-IN';
 
         recognition.onresult = (event) => {
             const transcript = Array.from(event.results)
@@ -61,7 +66,7 @@ const GeneralChat = () => {
                 recognitionRef.current.stop();
             }
         };
-    }, []);
+    }, [language]);
 
     const toggleListening = () => {
         if (!recognitionRef.current) return;
@@ -91,7 +96,8 @@ const GeneralChat = () => {
                 if (prev.length === 0) {
                     return [{
                         type: 'bot',
-                        text: "Hello! I am your Agrimate Assistant. 🌾 Ask me anything about farming, weather, or market prices."
+                        translationKey: 'chat.greeting',
+                        text: t('chat.greeting') // Fallback/Initial text
                     }];
                 }
                 return prev;
@@ -117,7 +123,7 @@ const GeneralChat = () => {
         setLoading(true);
 
         try {
-            const res = await chatAgent({ query: textToUse });
+            const res = await chatAgent({ query: textToUse, language });
             const botMsg = {
                 type: 'bot',
                 text: res.data.answer || "I'm sorry, I couldn't understand that."
@@ -125,7 +131,7 @@ const GeneralChat = () => {
             setMessages(prev => [...prev, botMsg]);
         } catch (error) {
             console.error(error);
-            setMessages(prev => [...prev, { type: 'bot', text: "⚠️ Network Error. Please try again." }]);
+            setMessages(prev => [...prev, { type: 'bot', text: t('chat.networkError') }]);
         } finally {
             setLoading(false);
         }
@@ -138,10 +144,10 @@ const GeneralChat = () => {
             <div className="container mx-auto px-4 pt-20 max-w-2xl h-[90vh] flex flex-col">
                 {/* Header */}
                 <div className="flex items-center gap-2 mb-4">
-                    <button onClick={() => navigate('/')} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+                    <button onClick={() => navigate('/home')} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
                         <ArrowLeft size={20} className="text-gray-600" />
                     </button>
-                    <h1 className="text-xl font-bold text-text-dark">Agrimate Assistant</h1>
+                    <h1 className="text-xl font-bold text-text-dark">{t('chat.title')}</h1>
                 </div>
 
                 {/* Chat Area */}
@@ -160,11 +166,11 @@ const GeneralChat = () => {
                                         {msg.type === 'user' ? <User size={14} className="md:w-4 md:h-4" /> : <Bot size={14} className="md:w-4 md:h-4" />}
                                     </div>
 
-                                    <div className={`p-3 md:p-4 rounded-2xl max-w-[85%] text-xs md:text-sm leading-relaxed shadow-sm ${msg.type === 'user'
+                                    <div className={`p-3 md:p-4 rounded-2xl max-w-[85%] text-xs md:text-base leading-relaxed shadow-sm ${msg.type === 'user'
                                         ? 'bg-green-600 text-white font-medium rounded-tr-none'
                                         : 'bg-white text-gray-800 font-medium rounded-tl-none border border-gray-100 shadow-sm'
                                         }`}>
-                                        {msg.text}
+                                        {msg.translationKey ? t(msg.translationKey) : msg.text}
                                     </div>
                                 </motion.div>
                             ))}
@@ -177,7 +183,7 @@ const GeneralChat = () => {
                                 </div>
                                 <div className="bg-white px-3 py-2 md:px-4 md:py-3 rounded-2xl rounded-tl-none shadow-sm border border-gray-100 flex items-center gap-2">
                                     <Loader2 size={14} className="animate-spin text-primary-green md:w-4 md:h-4" />
-                                    <span className="text-[10px] md:text-xs text-gray-400">Thinking...</span>
+                                    <span className="text-[10px] md:text-xs text-gray-400">{t('chat.thinking')}</span>
                                 </div>
                             </motion.div>
                         )}
@@ -193,7 +199,7 @@ const GeneralChat = () => {
                                 type="text"
                                 value={input}
                                 onChange={(e) => setInput(e.target.value)}
-                                placeholder={isListening ? "Listening..." : "Type your question..."}
+                                placeholder={isListening ? t('chat.listening') : t('chat.inputPlaceholder')}
                                 className={`w-full h-9 md:h-14 pl-3 md:pl-6 pr-8 md:pr-4 bg-white rounded-full shadow-lg border transition-all font-sans text-sm md:text-base ${isListening
                                     ? 'border-red-400 ring-2 ring-red-200'
                                     : 'border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary-green/50'

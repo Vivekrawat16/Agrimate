@@ -79,10 +79,10 @@ const Home = () => {
                 {/* Dashboard Header */}
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 mt-4">
                     <div>
-                        <h1 className="text-2xl md:text-3xl font-bold text-gray-900">🌾 Farmer Dashboard</h1>
+                        <h1 className="text-2xl md:text-3xl font-bold text-gray-900">🌾 {t('home.dashboard')}</h1>
                         <p className="text-gray-500 flex items-center gap-2 mt-1">
                             <Calendar size={14} />
-                            {dateStr}
+                            {t('common.today')}, {dateStr}
                         </p>
                     </div>
                     <div className="mt-4 md:mt-0 flex items-center gap-2">
@@ -104,9 +104,9 @@ const Home = () => {
                     ) : weatherError ? (
                         <div className="bg-gradient-to-r from-sky-500 to-blue-600 rounded-3xl p-8 text-center text-white">
                             <CloudRain size={40} className="mx-auto mb-2 opacity-50" />
-                            <p>{weatherError}</p>
+                            <p>{t('weather.fetchError')}</p>
                             <button onClick={fetchWeatherByLocation} className="mt-3 bg-white/20 px-4 py-2 rounded-full text-sm hover:bg-white/30 transition">
-                                Retry
+                                {t('common.retry')}
                             </button>
                         </div>
                     ) : weather && (
@@ -128,10 +128,10 @@ const Home = () => {
                                                 <span className="text-lg md:text-2xl text-white/60 ml-1">C</span>
                                             </div>
                                             <div className="text-white/90 text-sm md:text-lg mt-0.5 md:mt-1 font-medium">
-                                                {weather.current?.condition?.text}
+                                                {t(`weather.conditions.${weather.current?.condition?.code}`) || weather.current?.condition?.text}
                                             </div>
                                             <div className="text-white/70 text-xs md:text-sm">
-                                                Feels like {Math.round(weather.current?.feelslike_c)}°
+                                                {t('weather.feelsLike')} {Math.round(weather.current?.feelslike_c)}°
                                             </div>
                                         </div>
                                     </div>
@@ -139,10 +139,10 @@ const Home = () => {
                                     {/* Weather Stats - Compact Grid on Mobile */}
                                     <div className="grid grid-cols-4 gap-2 md:gap-4 mt-2 md:mt-0">
                                         {[
-                                            { icon: Droplets, val: `${weather.current?.humidity}%`, label: 'Humidity', color: 'text-blue-200' },
-                                            { icon: Wind, val: Math.round(weather.current?.wind_kph), label: 'Wind', color: 'text-blue-200' },
-                                            { icon: Sun, val: weather.current?.uv, label: 'UV', color: 'text-yellow-300' },
-                                            { icon: CloudRain, val: weather.current?.precip_mm, label: 'Rain', color: 'text-blue-200' }
+                                            { icon: Droplets, val: `${weather.current?.humidity}%`, label: t('weather.humidity'), color: 'text-blue-200' },
+                                            { icon: Wind, val: Math.round(weather.current?.wind_kph), label: t('weather.wind'), color: 'text-blue-200' },
+                                            { icon: Sun, val: weather.current?.uv, label: t('weather.uv'), color: 'text-yellow-300' },
+                                            { icon: CloudRain, val: weather.current?.precip_mm, label: t('weather.rain'), color: 'text-blue-200' }
                                         ].map((stat, i) => (
                                             <div key={i} className="bg-white/10 backdrop-blur-sm rounded-xl p-2 md:p-4 text-center flex flex-col items-center justify-center">
                                                 <stat.icon size={16} className={`mb-1 ${stat.color} md:w-5 md:h-5`} />
@@ -158,7 +158,7 @@ const Home = () => {
                                     <div className="flex justify-between items-center overflow-x-auto gap-3 pb-1 no-scrollbar">
                                         {weather.forecast?.forecastday?.map((day, i) => {
                                             const date = new Date(day.date);
-                                            const dayName = i === 0 ? 'Today' : date.toLocaleDateString('en-US', { weekday: 'short' });
+                                            const dayName = i === 0 ? t('common.today') : i === 1 ? t('common.tomorrow') : date.toLocaleDateString('en-US', { weekday: 'short' });
                                             return (
                                                 <div key={i} className="flex-1 min-w-[60px] md:min-w-[80px] text-center bg-white/10 rounded-lg md:rounded-xl py-2 md:py-3 px-1 md:px-2 shrink-0">
                                                     <div className="text-[10px] md:text-xs text-white/70 mb-1 uppercase tracking-wider">{dayName}</div>
@@ -177,6 +177,14 @@ const Home = () => {
                                 >
                                     <RefreshCw size={16} className="md:w-[18px] md:h-[18px]" />
                                 </button>
+
+                                {/* View Full Forecast Link */}
+                                <button
+                                    onClick={() => navigate('/weather')}
+                                    className="absolute bottom-3 right-3 md:bottom-4 md:right-4 px-3 py-1.5 bg-white/20 rounded-lg hover:bg-white/30 transition-colors text-xs font-medium flex items-center gap-1"
+                                >
+                                    {t('weather.fullForecast')} <ArrowRight size={14} />
+                                </button>
                             </div>
                         </div>
                     )}
@@ -190,8 +198,8 @@ const Home = () => {
                                 <Leaf className="text-green-600" size={20} />
                             </div>
                             <div>
-                                <h3 className="font-semibold text-gray-800">Ask Agrimate AI</h3>
-                                <p className="text-xs text-gray-500">Get instant farming advice</p>
+                                <h3 className="font-semibold text-gray-800">{t('chat.title')}</h3>
+                                <p className="text-xs text-gray-500">{t('chat.subtitle')}</p>
                             </div>
                         </div>
                         <AIInput
@@ -203,7 +211,7 @@ const Home = () => {
 
                 {/* Quick Actions Grid */}
                 <div className="mb-6">
-                    <h2 className="text-lg font-semibold text-gray-800 mb-4">Quick Actions</h2>
+                    <h2 className="text-lg font-semibold text-gray-800 mb-4">{t('weather.farmingInsights')}</h2>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
 
                         {/* Crop Recommendation */}
@@ -257,7 +265,7 @@ const Home = () => {
                 {/* Farming Tips from Weather */}
                 {weather?.insights && weather.insights.length > 0 && (
                     <div>
-                        <h2 className="text-lg font-semibold text-gray-800 mb-4">🌾 Today's Farming Tips</h2>
+                        <h2 className="text-lg font-semibold text-gray-800 mb-4">🌾 {t('weather.farmingInsights')}</h2>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                             {weather.insights.map((insight, i) => (
                                 <div
@@ -275,7 +283,7 @@ const Home = () => {
                 )}
 
             </div>
-        </div>
+        </div >
     );
 };
 

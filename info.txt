@@ -1,1 +1,34 @@
 ssh -i agrimate.pem ubuntu@16.170.205.238
+
+git add .
+git commit -m "optimized ui for mobile devices"
+git push origin main
+
+
+cd ~/Agrimate
+git pull origin main
+
+
+git reset --hard origin/main
+
+
+
+If You Changed BACKEND (Node / API)
+
+Go inside backend:
+
+cd backend
+npm install   # only if packages changed
+pm2 restart agrimate-backend
+
+If You Changed FRONTEND (React / Vite)
+
+Go:
+
+cd ~/Agrimate/frontend
+npm install
+npm run build
+
+
+pm2 reload agrimate-backend
+

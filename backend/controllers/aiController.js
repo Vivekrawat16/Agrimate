@@ -47,7 +47,12 @@ JSON Format:
 // @route   POST /api/ai/chat
 // @access  Public
 const chatAgent = asyncHandler(async (req, res) => {
-    const { query, history } = req.body;
+    const { query, history, language } = req.body;
+
+    // Determine the language for the response
+    const targetLanguage = language === 'hi' ? 'Hindi' : language === 'mr' ? 'Marathi' : 'English';
+    const langInstruction = language !== 'en' ? `Answer in ${targetLanguage}.` : '';
+
     // Construct prompt with history context if needed
     const prompt = `You are Agrimate, an expert agriculture assistant. You ONLY answer questions related to agriculture, farming, crops, soil, weather for farming, irrigation, pests, diseases, seeds, fertilizers, livestock, and related farming topics.
 
@@ -55,6 +60,7 @@ If the user asks about anything NOT related to agriculture or farming, politely 
 
 User Query: "${query}"
 
+${langInstruction}
 Return strictly valid JSON with your answer in concise markdown format.
 Schema: { "answer": "Your response here" }`;
 

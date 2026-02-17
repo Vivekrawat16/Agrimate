@@ -17,6 +17,7 @@ app.use(express.json());
 // Routes
 app.use('/api/ai', require('./routes/aiRoutes'));
 app.use('/api/weather', require('./routes/weatherRoutes'));
+app.use('/api/auth', require('./routes/authRoutes'));
 
 // Serve static assets in production
 const path = require('path');

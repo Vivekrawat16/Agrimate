@@ -11,13 +11,13 @@ const CropRecommendation = () => {
 
     // Define questions dynamically based on language
     const getQuestions = () => [
-        { key: 'soil', text: t('crop.greeting'), options: t('crop.options.soil') },
-        { key: 'landSize', text: t('crop.steps.landSize'), options: ['1 Acre', '2 Acres', '5 Acres', '10+ Acres'] }, // Numeric options usually remain static or can be translated
-        { key: 'season', text: t('crop.steps.season'), options: t('crop.options.season') },
-        { key: 'irrigation', text: t('crop.steps.irrigation'), options: t('crop.options.irrigation') },
-        { key: 'state', text: t('crop.steps.state'), options: [t('crop.options.detect'), 'Punjab', 'Uttar Pradesh', 'Madhya Pradesh', 'Maharashtra'] },
-        { key: 'district', text: t('crop.steps.district'), options: [] },
-        { key: 'previousCrop', text: t('crop.steps.previousCrop'), options: ['Wheat', 'Rice', 'Maize', 'None'] },
+        { key: 'soil', translationKey: 'crop.greeting', text: t('crop.greeting'), options: t('crop.options.soil') },
+        { key: 'landSize', translationKey: 'crop.steps.landSize', text: t('crop.steps.landSize'), options: t('crop.options.landSize') },
+        { key: 'season', translationKey: 'crop.steps.season', text: t('crop.steps.season'), options: t('crop.options.season') },
+        { key: 'irrigation', translationKey: 'crop.steps.irrigation', text: t('crop.steps.irrigation'), options: t('crop.options.irrigation') },
+        { key: 'state', translationKey: 'crop.steps.state', text: t('crop.steps.state'), options: [t('crop.options.detect'), ...t('crop.options.state')] },
+        { key: 'district', translationKey: 'crop.steps.district', text: t('crop.steps.district'), options: [] },
+        { key: 'previousCrop', translationKey: 'crop.steps.previousCrop', text: t('crop.steps.previousCrop'), options: t('crop.options.previousCrop') },
     ];
 
     const questions = getQuestions();
@@ -50,16 +50,20 @@ const CropRecommendation = () => {
     useEffect(() => {
         setMessages(prevMessages => {
             if (prevMessages.length === 0) {
-                return [{ type: 'bot', text: questions[0].text }];
+                return [{
+                    type: 'bot',
+                    translationKey: questions[0].translationKey,
+                    text: questions[0].text
+                }];
             }
             return prevMessages;
         });
     }, []);
 
-    const simulateBotResponse = (text, delay = 600) => {
+    const simulateBotResponse = (text, translationKey, delay = 600) => {
         setIsTyping(true);
         setTimeout(() => {
-            setMessages(prev => [...prev, { type: 'bot', text }]);
+            setMessages(prev => [...prev, { type: 'bot', text, translationKey }]);
             setIsTyping(false);
         }, delay);
     };
@@ -89,7 +93,7 @@ const CropRecommendation = () => {
 
                     // Skip 'district' step (index 5) and jump to 'previousCrop' (index 6)
                     setStep(6);
-                    simulateBotResponse(questions[6].text);
+                    simulateBotResponse(questions[6].text, questions[6].translationKey);
                 } else {
                     throw new Error("Location details incomplete");
                 }
@@ -110,7 +114,7 @@ const CropRecommendation = () => {
         const currentAnswer = input;
 
         // Handle Location Detection Trigger
-        if (currentAnswer === '📍 Detect Location') {
+        if (currentAnswer === t('crop.options.detect') || currentAnswer === '📍 Detect Location') {
             setMessages(prev => [...prev, { type: 'user', text: currentAnswer }]);
             setInput('');
             detectLocation();
@@ -127,7 +131,7 @@ const CropRecommendation = () => {
         // Move to next step or submit
         if (step < questions.length - 1) {
             setStep(prev => prev + 1);
-            simulateBotResponse(questions[step + 1].text);
+            simulateBotResponse(questions[step + 1].text, questions[step + 1].translationKey);
         } else {
             // Submit form
             setLoading(true);
@@ -178,31 +182,33 @@ const CropRecommendation = () => {
                                     {/* Bubble */}
                                     {msg.type === 'result' ? (
                                         <div className="w-full">
-                                            {msg.data.recommended_crops?.map((crop, i) => (
-                                                <div key={i} className="bg-white rounded-2xl shadow-soft p-4 md:p-5 border border-green-100 mb-4">
-                                                    <h3 className="text-lg md:text-xl font-bold text-primary-green flex items-center gap-2 mb-2">
-                                                        <Leaf size={18} className="md:w-5 md:h-5" /> {crop.name}
-                                                    </h3>
-                                                    <p className="text-gray-600 italic mb-4 text-xs md:text-base">"{crop.reason}"</p>
-                                                    <div className="grid grid-cols-3 gap-2 text-sm bg-light-bg p-2 md:p-3 rounded-lg">
-                                                        <div className="flex flex-col items-center text-center">
-                                                            <Droplets size={14} className="text-blue-500 mb-1 md:w-4 md:h-4" />
-                                                            <span className="text-[10px] md:text-xs text-gray-500">Water</span>
-                                                            <span className="font-medium text-gray-700 text-xs md:text-sm">{crop.water_requirement}</span>
-                                                        </div>
-                                                        <div className="flex flex-col items-center text-center">
-                                                            <DollarSign size={14} className="text-yellow-600 mb-1 md:w-4 md:h-4" />
-                                                            <span className="text-[10px] md:text-xs text-gray-500">Profit</span>
-                                                            <span className="font-medium text-gray-700 text-xs md:text-sm">{crop.expected_profit}</span>
-                                                        </div>
-                                                        <div className="flex flex-col items-center text-center">
-                                                            <Clock size={14} className="text-purple-500 mb-1 md:w-4 md:h-4" />
-                                                            <span className="text-[10px] md:text-xs text-gray-500">Duration</span>
-                                                            <span className="font-medium text-gray-700 text-xs md:text-sm">{crop.growth_duration}</span>
+                                            <div className="flex overflow-x-auto gap-4 pb-4 snap-x no-scrollbar">
+                                                {msg.data.recommended_crops?.map((crop, i) => (
+                                                    <div key={i} className="min-w-[85%] md:min-w-[350px] snap-center bg-white rounded-2xl shadow-soft p-4 md:p-5 border border-green-100">
+                                                        <h3 className="text-lg md:text-xl font-bold text-primary-green flex items-center gap-2 mb-2">
+                                                            <Leaf size={18} className="md:w-5 md:h-5" /> {crop.name}
+                                                        </h3>
+                                                        <p className="text-gray-600 italic mb-4 text-xs md:text-base">"{crop.reason}"</p>
+                                                        <div className="grid grid-cols-3 gap-2 text-sm bg-light-bg p-2 md:p-3 rounded-lg">
+                                                            <div className="flex flex-col items-center text-center">
+                                                                <Droplets size={14} className="text-blue-500 mb-1 md:w-4 md:h-4" />
+                                                                <span className="text-[10px] md:text-xs text-gray-500">Water</span>
+                                                                <span className="font-medium text-gray-700 text-xs md:text-sm">{crop.water_requirement}</span>
+                                                            </div>
+                                                            <div className="flex flex-col items-center text-center">
+                                                                <DollarSign size={14} className="text-yellow-600 mb-1 md:w-4 md:h-4" />
+                                                                <span className="text-[10px] md:text-xs text-gray-500">Profit</span>
+                                                                <span className="font-medium text-gray-700 text-xs md:text-sm">{crop.expected_profit}</span>
+                                                            </div>
+                                                            <div className="flex flex-col items-center text-center">
+                                                                <Clock size={14} className="text-purple-500 mb-1 md:w-4 md:h-4" />
+                                                                <span className="text-[10px] md:text-xs text-gray-500">Duration</span>
+                                                                <span className="font-medium text-gray-700 text-xs md:text-sm">{crop.growth_duration}</span>
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                </div>
-                                            ))}
+                                                ))}
+                                            </div>
                                             <button onClick={() => window.location.reload()} className="w-full py-2 md:py-3 mt-2 bg-gray-100 rounded-xl text-gray-600 font-medium hover:bg-gray-200 transition-colors text-sm md:text-base">
                                                 Start Over
                                             </button>
@@ -212,7 +218,7 @@ const CropRecommendation = () => {
                                             ? 'bg-green-100 text-green-900 rounded-br-none shadow-sm border border-green-200'
                                             : 'bg-white text-text-dark rounded-bl-none border border-gray-100 shadow-sm'
                                             }`}
-                                            dangerouslySetInnerHTML={{ __html: msg.text.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>') }}
+                                            dangerouslySetInnerHTML={{ __html: (msg.translationKey ? t(msg.translationKey) : msg.text).replace(/\*\*(.*?)\*\*/g, '<b>$1</b>') }}
                                         >
 
                                         </div>)}

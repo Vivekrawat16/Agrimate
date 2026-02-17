@@ -9,7 +9,7 @@ const BottomNav = () => {
     const { t } = useLanguage();
 
     const navLinks = [
-        { path: '/', labelKey: 'nav.dashboard', icon: Home },
+        { path: '/home', labelKey: 'nav.dashboard', icon: Home },
         { path: '/crop', labelKey: 'nav.crop', icon: Sprout },
         { path: '/yield', labelKey: 'nav.yield', icon: TrendingUp },
         { path: '/disease', labelKey: 'nav.disease', icon: Bug },

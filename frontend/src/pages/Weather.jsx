@@ -3,9 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, MapPin, Thermometer, Droplets, Wind, Sun, CloudRain, AlertTriangle, Loader2, Search, RefreshCw, Leaf } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Navbar from '../components/Navbar';
+import { useLanguage } from '../context/LanguageContext';
 import { getWeatherForecast } from '../services/api';
 
 const Weather = () => {
+    const { t } = useLanguage();
     const navigate = useNavigate();
     const [location, setLocation] = useState('');
     const [weatherData, setWeatherData] = useState(null);
@@ -35,7 +37,7 @@ const Weather = () => {
             },
             (err) => {
                 setDetecting(false);
-                setError('Location access denied. Please enter city name.');
+                setError(t('weather.locationDenied'));
             }
         );
     };
@@ -51,7 +53,7 @@ const Weather = () => {
             setWeatherData(data);
         } catch (err) {
             console.error(err);
-            setError('Could not fetch weather. Please check the city name.');
+            setError(t('weather.fetchError'));
         } finally {
             setLoading(false);
         }
@@ -96,10 +98,10 @@ const Weather = () => {
             <div className="container mx-auto px-4 pt-20 pb-8 max-w-4xl">
                 {/* Header */}
                 <div className="flex items-center gap-3 mb-6">
-                    <button onClick={() => navigate('/')} className="p-2 hover:bg-white/50 rounded-full transition-colors">
+                    <button onClick={() => navigate('/home')} className="p-2 hover:bg-white/50 rounded-full transition-colors">
                         <ArrowLeft size={22} className="text-gray-600" />
                     </button>
-                    <h1 className="text-2xl font-bold text-gray-800">Weather Forecast</h1>
+                    <h1 className="text-2xl font-bold text-gray-800">{t('weather.title')}</h1>
                 </div>
 
                 {/* Search Bar */}
@@ -111,7 +113,7 @@ const Weather = () => {
                                 type="text"
                                 value={location}
                                 onChange={(e) => setLocation(e.target.value)}
-                                placeholder="Enter city name..."
+                                placeholder={t('weather.searchPlaceholder')}
                                 className="w-full h-14 pl-12 pr-4 bg-white rounded-2xl shadow-lg border-0 focus:outline-none focus:ring-2 focus:ring-sky-400 text-gray-800 placeholder:text-gray-400"
                             />
                         </div>
@@ -129,7 +131,7 @@ const Weather = () => {
                             className="h-14 px-6 bg-sky-600 text-white rounded-2xl shadow-lg font-medium hover:bg-sky-700 transition-colors disabled:opacity-50 flex items-center gap-2"
                         >
                             {loading ? <Loader2 size={20} className="animate-spin" /> : <RefreshCw size={20} />}
-                            <span className="hidden sm:inline">Update</span>
+                            <span className="hidden sm:inline">{t('common.update')}</span>
                         </button>
                     </div>
                 </form>
@@ -150,7 +152,7 @@ const Weather = () => {
                 {loading && !weatherData && (
                     <div className="flex flex-col items-center justify-center py-20">
                         <Loader2 size={48} className="animate-spin text-sky-600 mb-4" />
-                        <p className="text-gray-500">Fetching weather data...</p>
+                        <p className="text-gray-500">{t('common.loading')}</p>
                     </div>
                 )}
 
@@ -175,47 +177,46 @@ const Weather = () => {
                                         <div className="text-6xl font-bold text-gray-800">
                                             {Math.round(weatherData.current.temp_c)}°
                                         </div>
-                                        <div className="text-gray-500 mt-1">{weatherData.current.condition.text}</div>
-                                        <div className="text-sm text-gray-400 mt-1">
-                                            Feels like {Math.round(weatherData.current.feelslike_c)}°
-                                        </div>
+                                        {t('weather.conditions.' + weatherData.current.condition.code) || weatherData.current.condition.text}
                                     </div>
-                                    <div className="text-8xl">
-                                        {getWeatherIcon(weatherData.current.condition.code, weatherData.current.is_day)}
+                                    <div className="text-sm text-gray-400 mt-1">
+                                        {t('weather.feelsLike')} {Math.round(weatherData.current.feelslike_c)}°
                                     </div>
                                 </div>
-
-                                {/* Weather Stats */}
-                                <div className="grid grid-cols-4 gap-3 mt-6 pt-6 border-t border-gray-100">
-                                    <div className="text-center">
-                                        <Droplets className="mx-auto text-blue-500 mb-1" size={22} />
-                                        <div className="text-lg font-semibold text-gray-800">{weatherData.current.humidity}%</div>
-                                        <div className="text-xs text-gray-500">Humidity</div>
-                                    </div>
-                                    <div className="text-center">
-                                        <Wind className="mx-auto text-gray-500 mb-1" size={22} />
-                                        <div className="text-lg font-semibold text-gray-800">{Math.round(weatherData.current.wind_kph)} km/h</div>
-                                        <div className="text-xs text-gray-500">Wind</div>
-                                    </div>
-                                    <div className="text-center">
-                                        <Sun className="mx-auto text-yellow-500 mb-1" size={22} />
-                                        <div className="text-lg font-semibold text-gray-800">{weatherData.current.uv}</div>
-                                        <div className="text-xs text-gray-500">UV Index</div>
-                                    </div>
-                                    <div className="text-center">
-                                        <CloudRain className="mx-auto text-sky-500 mb-1" size={22} />
-                                        <div className="text-lg font-semibold text-gray-800">{weatherData.current.precip_mm} mm</div>
-                                        <div className="text-xs text-gray-500">Precipitation</div>
-                                    </div>
+                                <div className="text-8xl">
+                                    {getWeatherIcon(weatherData.current.condition.code, weatherData.current.is_day)}
                                 </div>
                             </div>
 
+                            {/* Weather Stats */}
+                            <div className="grid grid-cols-4 gap-3 mt-6 pt-6 border-t border-gray-100">
+                                <div className="text-center">
+                                    <Droplets className="mx-auto text-blue-500 mb-1" size={22} />
+                                    <div className="text-lg font-semibold text-gray-800">{weatherData.current.humidity}%</div>
+                                    <div className="text-xs text-gray-500">{t('weather.humidity')}</div>
+                                </div>
+                                <div className="text-center">
+                                    <Wind className="mx-auto text-gray-500 mb-1" size={22} />
+                                    <div className="text-lg font-semibold text-gray-800">{Math.round(weatherData.current.wind_kph)} km/h</div>
+                                    <div className="text-xs text-gray-500">{t('weather.wind')}</div>
+                                </div>
+                                <div className="text-center">
+                                    <Sun className="mx-auto text-yellow-500 mb-1" size={22} />
+                                    <div className="text-lg font-semibold text-gray-800">{weatherData.current.uv}</div>
+                                    <div className="text-xs text-gray-500">{t('weather.uv')}</div>
+                                </div>
+                                <div className="text-center">
+                                    <CloudRain className="mx-auto text-sky-500 mb-1" size={22} />
+                                    <div className="text-lg font-semibold text-gray-800">{weatherData.current.precip_mm} mm</div>
+                                    <div className="text-xs text-gray-500">{t('weather.precipitation')}</div>
+                                </div>
+                            </div>
                             {/* Farming Insights */}
                             {weatherData.insights && weatherData.insights.length > 0 && (
                                 <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl p-6 border border-white/50">
                                     <h3 className="font-bold text-gray-800 flex items-center gap-2 mb-4">
                                         <Leaf className="text-green-600" size={20} />
-                                        Farming Insights
+                                        {t('weather.farmingInsights')}
                                     </h3>
                                     <div className="space-y-3">
                                         {weatherData.insights.map((insight, i) => (
@@ -234,14 +235,14 @@ const Weather = () => {
                                 <div className="space-y-3">
                                     {weatherData.forecast?.forecastday?.map((day, i) => {
                                         const date = new Date(day.date);
-                                        const dayName = i === 0 ? 'Today' : date.toLocaleDateString('en-US', { weekday: 'short' });
+                                        const dayName = i === 0 ? t('common.today') : i === 1 ? t('common.tomorrow') : date.toLocaleDateString('en-US', { weekday: 'short' });
 
                                         return (
                                             <div key={i} className="flex items-center justify-between py-3 border-b border-gray-100 last:border-0">
                                                 <div className="w-20 text-gray-600 font-medium">{dayName}</div>
                                                 <div className="text-3xl">{getWeatherIcon(day.day.condition.code, true)}</div>
                                                 <div className="flex-1 text-center text-sm text-gray-500 hidden sm:block">
-                                                    {day.day.condition.text}
+                                                    {t('weather.conditions.' + day.day.condition.code) || day.day.condition.text}
                                                 </div>
                                                 <div className="flex items-center gap-2">
                                                     <Droplets size={14} className="text-blue-400" />
@@ -262,7 +263,7 @@ const Weather = () => {
                                 <div className="bg-red-50 rounded-3xl shadow-xl p-6 border border-red-200">
                                     <h3 className="font-bold text-red-800 flex items-center gap-2 mb-4">
                                         <AlertTriangle className="text-red-600" size={20} />
-                                        Weather Alerts
+                                        {t('weather.alerts')}
                                     </h3>
                                     <div className="space-y-3">
                                         {weatherData.alerts.alert.map((alert, i) => (
@@ -278,7 +279,7 @@ const Weather = () => {
                     )}
                 </AnimatePresence>
             </div>
-        </div>
+        </div >
     );
 };
 
