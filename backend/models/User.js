@@ -13,7 +13,17 @@ const userSchema = new mongoose.Schema({
     },
     password: {
         type: String,
-        required: [true, 'Please add a password']
+        required: function () {
+            return this.provider === 'local';
+        }
+    },
+    googleId: {
+        type: String
+    },
+    provider: {
+        type: String,
+        enum: ['local', 'google'],
+        default: 'local'
     }
 }, {
     timestamps: true

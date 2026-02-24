@@ -14,6 +14,12 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Set Cross-Origin-Opener-Policy to allow popup communication
+app.use((req, res, next) => {
+    res.setHeader('Cross-Origin-Opener-Policy', 'same-origin-allow-popups');
+    next();
+});
+
 // Routes
 app.use('/api/ai', require('./routes/aiRoutes'));
 app.use('/api/weather', require('./routes/weatherRoutes'));

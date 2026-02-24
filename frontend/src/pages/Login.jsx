@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Mail, Lock, Loader2, ArrowRight } from 'lucide-react';
+import { GoogleLogin } from '@react-oauth/google';
+import axios from 'axios';
 
 const Login = () => {
     const [email, setEmail] = useState('');
@@ -24,6 +26,26 @@ const Login = () => {
         } else {
             setError(res.message);
         }
+    };
+
+    const handleGoogleSuccess = async (credentialResponse) => {
+        try {
+            const { credential } = credentialResponse;
+            const res = await axios.post('http://localhost:5000/api/auth/google', { token: credential });
+
+            // This replicates what context login might be doing, ideally use context
+            if (res.data.token) {
+                localStorage.setItem('user', JSON.stringify(res.data));
+                navigate('/dashboard'); // Per requirements
+            }
+        } catch (err) {
+            console.error(err);
+            setError(err.response?.data?.message || 'Google Login Failed');
+        }
+    };
+
+    const handleGoogleError = () => {
+        setError('Google Login Failed');
     };
 
     return (
@@ -80,6 +102,29 @@ const Login = () => {
                         {!loading && <ArrowRight size={20} />}
                     </button>
                 </form>
+
+                <div className="mt-6">
+                    <div className="relative">
+                        <div className="absolute inset-0 flex items-center">
+                            <div className="w-full border-t border-gray-300"></div>
+                        </div>
+                        <div className="relative flex justify-center text-sm">
+                            <span className="px-2 bg-white text-gray-500">Or continue with</span>
+                        </div>
+                    </div>
+
+                    <div className="mt-6 flex justify-center">
+                        <GoogleLogin
+                            onSuccess={handleGoogleSuccess}
+                            onError={handleGoogleError}
+                            theme="outline"
+                            size="large"
+                            text="signin_with"
+                            shape="rectangular"
+                            width="100%"
+                        />
+                    </div>
+                </div>
 
                 <p className="mt-8 text-center text-gray-600">
                     Don't have an account?{' '}

@@ -2,6 +2,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const asyncHandler = require('express-async-handler');
 const User = require('../models/User');
+const { verifyGoogleToken } = require('../services/googleAuthService');
 
 // Generate JWT
 const generateToken = (id) => {
@@ -79,8 +80,57 @@ const getMe = asyncHandler(async (req, res) => {
     res.status(200).json(req.user);
 });
 
+// @desc    Authenticate with Google
+// @route   POST /api/auth/google
+// @access  Public
+const googleAuth = asyncHandler(async (req, res) => {
+    const { token } = req.body;
+
+    if (!token) {
+        res.status(400);
+        throw new Error('Google token is missing');
+    }
+
+    try {
+        const payload = await verifyGoogleToken(token);
+        const { email, name, sub: googleId } = payload;
+
+        // Check if user already exists
+        let user = await User.findOne({ email });
+
+        if (user) {
+            // If user exists but registered via local, you might want to link or just let them login
+            // For now, we just log them in
+            if (!user.googleId) {
+                user.googleId = googleId;
+                await user.save();
+            }
+        } else {
+            // Create a new user since they don't exist
+            user = await User.create({
+                name,
+                email,
+                googleId,
+                provider: 'google'
+            });
+        }
+
+        res.status(200).json({
+            _id: user.id,
+            name: user.name,
+            email: user.email,
+            token: generateToken(user._id),
+            provider: user.provider
+        });
+    } catch (error) {
+        res.status(401);
+        throw new Error('Invalid Google token');
+    }
+});
+
 module.exports = {
     registerUser,
     loginUser,
     getMe,
+    googleAuth,
 };
