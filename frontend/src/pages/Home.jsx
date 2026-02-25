@@ -5,11 +5,13 @@ import Navbar from '../components/Navbar';
 import AIInput from '../components/AIInput';
 import GlassCard from '../components/GlassCard';
 import { useLanguage } from '../context/LanguageContext';
+import { useAuth } from '../context/AuthContext';
 import { getWeatherForecast } from '../services/api';
 
 const Home = () => {
     const navigate = useNavigate();
     const { t } = useLanguage();
+    const { user } = useAuth();
 
     // Weather state
     const [weather, setWeather] = useState(null);
@@ -80,6 +82,11 @@ const Home = () => {
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 mt-4">
                     <div>
                         <h1 className="text-2xl md:text-3xl font-bold text-gray-900">🌾 {t('home.dashboard')}</h1>
+                        {user?.name && (
+                            <p className="text-lg text-green-700 font-medium mt-1">
+                                {t('home.welcome').replace('{name}', user.name.split(' ')[0])}
+                            </p>
+                        )}
                         <p className="text-gray-500 flex items-center gap-2 mt-1">
                             <Calendar size={14} />
                             {t('common.today')}, {dateStr}

@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Home, Sprout, TrendingUp, Bug, MessageSquare } from 'lucide-react';
+import { Home, Sprout, TrendingUp, Bug, MessageSquare, User } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 
 const BottomNav = () => {
@@ -14,6 +14,7 @@ const BottomNav = () => {
         { path: '/yield', labelKey: 'nav.yield', icon: TrendingUp },
         { path: '/disease', labelKey: 'nav.disease', icon: Bug },
         { path: '/chat', labelKey: 'nav.chat', icon: MessageSquare },
+        { path: '/profile', labelKey: 'nav.profile', icon: User },
     ];
 
     return (

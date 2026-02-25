@@ -11,6 +11,7 @@ import GeneralChat from './pages/GeneralChat';
 import Landing from './pages/Landing';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
+import Profile from './pages/Profile';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import { LanguageProvider } from './context/LanguageContext';
@@ -56,6 +57,7 @@ function App() {
               <Route path="/disease" element={<ProtectedRoute><DiseasePrediction /></ProtectedRoute>} />
               <Route path="/chat" element={<ProtectedRoute><GeneralChat /></ProtectedRoute>} />
               <Route path="/weather" element={<ProtectedRoute><Weather /></ProtectedRoute>} />
+              <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
             </Routes>
           </Layout>
         </Router>

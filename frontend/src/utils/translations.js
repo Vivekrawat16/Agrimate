@@ -8,7 +8,9 @@ export const translations = {
             crop: "Crop",
             yield: "Yield",
             disease: "Disease",
-            chat: "Chat"
+            chat: "Chat",
+            profile: "Profile",
+            signOut: "Sign Out"
         },
         common: {
             loading: "Loading...",
@@ -100,6 +102,7 @@ export const translations = {
             heroSubtitle: "Your intelligent farming assistant.",
             inputPlaceholder: "Ask about weather, market prices, or farming advice...",
             dashboard: "Farmer Dashboard",
+            welcome: "Welcome back, {name} 👋",
             cards: {
                 weather: { title: "Weather", subtitle: "Rain likely" },
                 yield: { title: "Yield Predictor", subtitle: "Harvest forecast" },
@@ -168,6 +171,72 @@ export const translations = {
                 weather: ['Humid', 'Rainy', 'Dry/Hot', 'Cold'],
                 fertilizer: ['None', 'Urea', 'NPK', 'Fungicide']
             }
+        },
+        landing: {
+            badge: "The Future of Smart Farming",
+            heroTitle: "Grow Smarter with",
+            heroTitleHighlight: "Artificial Intelligence",
+            heroSubtitle: "Instant crop recommendations, disease diagnosis, and yield predictions—right from your pocket.",
+            startFree: "Start for Free",
+            logIn: "Log In",
+            featuresTitle: "Everything You Need to Grow",
+            featuresSubtitle: "Advanced tools simplified for every farmer. Make data-driven decisions with confidence and increase your profitability.",
+            features: {
+                cropTitle: "AI Crop Advisor",
+                cropDesc: "Get backed suggestions on the absolute best crops to plant based on your specific soil and climate.",
+                yieldTitle: "Yield Prediction",
+                yieldDesc: "Estimate your harvest quantity effortlessly before you even plant the seeds.",
+                diseaseTitle: "Plant Doctor",
+                diseaseDesc: "Identify plant diseases instantly by uploading a photo of the affected leaf from your phone.",
+                weatherTitle: "Local Weather",
+                weatherDesc: "Real-time localized precision weather updates to help you plan your daily farming activities."
+            },
+            showcaseTitle: "Smart Farming in Your Pocket",
+            showcaseSubtitle: "No complex manuals required. Agrimate is built from the ground up to be incredibly intuitive, working perfectly on your smartphone even out in the field.",
+            showcasePoints: [
+                "Instant answers from our expert AI Chatbot",
+                "Full support for multiple local languages",
+                "Highly optimized for mobile networks",
+                "Secure, private, and yours to control"
+            ],
+            ctaTitle: "Ready to Modernize Your Farm?",
+            ctaSubtitle: "Join thousands of smart farmers using Agrimate to increase yields and drastically reduce farming risks.",
+            createAccount: "Create Your Free Account",
+            footer: "Agrimate AI. Built for the modern farmer."
+        },
+        login: {
+            title: "Welcome Back",
+            subtitle: "Sign in to continue to Agrimate",
+            email: "Email Address",
+            password: "Password",
+            emailPlaceholder: "you@example.com",
+            passwordPlaceholder: "••••••••",
+            signIn: "Sign In",
+            orContinue: "Or continue with",
+            noAccount: "Don't have an account?",
+            signUp: "Sign Up"
+        },
+        signup: {
+            title: "Create Account",
+            subtitle: "Join the Agrimate community today",
+            fullName: "Full Name",
+            namePlaceholder: "John Doe",
+            email: "Email Address",
+            emailPlaceholder: "you@example.com",
+            password: "Password",
+            passwordPlaceholder: "••••••••",
+            createAccount: "Create Account",
+            orContinue: "Or continue with",
+            hasAccount: "Already have an account?",
+            signIn: "Sign In"
+        },
+        profile: {
+            title: "My Profile",
+            accountType: "Account Type",
+            local: "Local",
+            status: "Status",
+            active: "Active",
+            signOut: "Sign Out"
         }
     },
     hi: {
@@ -179,7 +248,9 @@ export const translations = {
             crop: "फसल",
             yield: "उपज",
             disease: "रोग",
-            chat: "चैट"
+            chat: "चैट",
+            profile: "प्रोफ़ाइल",
+            signOut: "साइन आउट"
         },
         common: {
             loading: "लोड हो रहा है...",
@@ -271,6 +342,7 @@ export const translations = {
             heroSubtitle: "आपका बुद्धिमान कृषि सहायक।",
             inputPlaceholder: "मौसम, बाजार भाव या खेती की सलाह के बारे में पूछें...",
             dashboard: "किसान डैशबोर्ड",
+            welcome: "वापसी पर स्वागत है, {name} 👋",
             cards: {
                 weather: { title: "मौसम", subtitle: "बारिश की संभावना" },
                 yield: { title: "उपज अनुमान", subtitle: "फसल पूर्वानुमान" },
@@ -339,6 +411,72 @@ export const translations = {
                 weather: ['आर्द्र', 'बरसात', 'सुखा/गर्म', 'ठंडा'],
                 fertilizer: ['कोई नहीं', 'यूरिया', 'एनपीके', 'फफूंदनाशक']
             }
+        },
+        landing: {
+            badge: "स्मार्ट खेती का भविष्य",
+            heroTitle: "इसके साथ समझदारी से खेती करें",
+            heroTitleHighlight: "कृत्रिम बुद्धिमत्ता (AI)",
+            heroSubtitle: "त्वरित फसल सिफारिशें, रोग निदान, और उपज की भविष्यवाणी—सीधे आपकी जेब से।",
+            startFree: "मुफ़्त में शुरू करें",
+            logIn: "लॉग इन करें",
+            featuresTitle: "खेती के लिए आपकी जरूरत की हर चीज",
+            featuresSubtitle: "हर किसान के लिए उन्नत उपकरण। आत्मविश्वास के साथ डेटा-संचालित निर्णय लें और अपना मुनाफा बढ़ाएं।",
+            features: {
+                cropTitle: "एआई फसल सलाहकार",
+                cropDesc: "अपनी विशिष्ट मिट्टी और जलवायु के आधार पर बुवाई के लिए सर्वोत्तम फसलों पर समर्थित सुझाव प्राप्त करें।",
+                yieldTitle: "उपज अनुमान",
+                yieldDesc: "बीज बोने से पहले ही अपनी फसल की मात्रा का आसानी से अनुमान लगाएं।",
+                diseaseTitle: "पौधा चिकित्सक",
+                diseaseDesc: "अपने फोन से प्रभावित पत्ती की तस्वीर अपलोड करके तुरंत पौधे की बीमारियों की पहचान करें।",
+                weatherTitle: "स्थानीय मौसम",
+                weatherDesc: "आपकी दैनिक कृषि गतिविधियों की योजना बनाने में मदद के लिए रीयल-टाइम स्थानीयकृत सटीक मौसम अपडेट।"
+            },
+            showcaseTitle: "आपकी जेब में स्मार्ट खेती",
+            showcaseSubtitle: "किसी जटिल मैनुअल की आवश्यकता नहीं है। एग्रीमेट को अविश्वसनीय रूप से सहज होने के लिए बनाया गया है, जो खेत में भी आपके स्मार्टफोन पर पूरी तरह से काम करता है।",
+            showcasePoints: [
+                "हमारे विशेषज्ञ एआई चैटबॉट से तुरंत जवाब",
+                "कई स्थानीय भाषाओं के लिए पूर्ण समर्थन",
+                "मोबाइल नेटवर्क के लिए अत्यधिक अनुकूलित",
+                "सुरक्षित, निजी और आपके नियंत्रण में"
+            ],
+            ctaTitle: "क्या आप अपने खेत को आधुनिक बनाने के लिए तैयार हैं?",
+            ctaSubtitle: "पैदावार बढ़ाने और खेती के जोखिमों को कम करने के लिए एग्रीमेट का उपयोग करने वाले हजारों स्मार्ट किसानों से जुड़ें।",
+            createAccount: "अपना मुफ़्त खाता बनाएँ",
+            footer: "एग्रीमेट एआई। आधुनिक किसान के लिए निर्मित।"
+        },
+        login: {
+            title: "वापसी पर स्वागत है",
+            subtitle: "एग्रीमेट में जारी रखने के लिए साइन इन करें",
+            email: "ईमेल पता",
+            password: "पासवर्ड",
+            emailPlaceholder: "you@example.com",
+            passwordPlaceholder: "••••••••",
+            signIn: "साइन इन करें",
+            orContinue: "या इसके साथ जारी रखें",
+            noAccount: "क्या आपके पास खाता नहीं है?",
+            signUp: "साइन अप करें"
+        },
+        signup: {
+            title: "खाता बनाएँ",
+            subtitle: "आज ही एग्रीमेट समुदाय में शामिल हों",
+            fullName: "पूरा नाम",
+            namePlaceholder: "जॉन डो",
+            email: "ईमेल पता",
+            emailPlaceholder: "you@example.com",
+            password: "पासवर्ड",
+            passwordPlaceholder: "••••••••",
+            createAccount: "खाता बनाएँ",
+            orContinue: "या इसके साथ जारी रखें",
+            hasAccount: "क्या आपके पास पहले से खाता है?",
+            signIn: "साइन इन करें"
+        },
+        profile: {
+            title: "मेरी प्रोफ़ाइल",
+            accountType: "खाता प्रकार",
+            local: "स्थानीय",
+            status: "स्थिति",
+            active: "सक्रिय",
+            signOut: "साइन आउट"
         }
     },
     mr: {
@@ -350,7 +488,9 @@ export const translations = {
             crop: "पीक",
             yield: "उत्पन्न",
             disease: "रोग",
-            chat: "चॅट"
+            chat: "चॅट",
+            profile: "प्रोफाइल",
+            signOut: "साइन आउट"
         },
         common: {
             loading: "लोड करत आहे...",
@@ -442,6 +582,7 @@ export const translations = {
             heroSubtitle: "माझा हुशार शेती सहाय्यक.",
             inputPlaceholder: "हवामान, बाजारभाव किंवा शेतीविषयक सल्ल्याबद्दल विचारा...",
             dashboard: "शेतकरी डॅशबोर्ड",
+            welcome: "तुमचे स्वागत आहे, {name} 👋",
             cards: {
                 weather: { title: "हवामान", subtitle: "पावसाची शक्यता" },
                 yield: { title: "उत्पन्न अंदाज", subtitle: "पीक अंदाज" },
@@ -510,6 +651,72 @@ export const translations = {
                 weather: ['दमट', 'पावसाळी', 'कोरडे/गरम', 'थंड'],
                 fertilizer: ['काहीही नाही', 'युरिया', 'NPK', 'बुरशीनाशक']
             }
+        },
+        landing: {
+            badge: "स्मार्ट शेतीचे भविष्य",
+            heroTitle: "यांच्यासोबत अधिक हुशारीने शेती करा",
+            heroTitleHighlight: "कृत्रिम बुद्धिमत्ता (AI)",
+            heroSubtitle: "त्वरित पीक शिफारसी, रोग निदान आणि उत्पादन अंदाज—थेट तुमच्या खिशातून.",
+            startFree: "मोफत सुरू करा",
+            logIn: "लॉग इन करा",
+            featuresTitle: "शेतीसाठी आवश्यक असलेले सर्व काही",
+            featuresSubtitle: "प्रत्येक शेतकऱ्यासाठी प्रगत साधने. आत्मविश्वासाने डेटा-आधारित निर्णय घ्या आणि तुमचा नफा वाढवा.",
+            features: {
+                cropTitle: "एआय पीक सल्लागार",
+                cropDesc: "तुमच्या विशिष्ट माती आणि हवामानावर आधारित लागवडीसाठी सर्वोत्तम पिकांवर समर्थित सूचना मिळवा.",
+                yieldTitle: "उत्पादन अंदाज",
+                yieldDesc: "बियाणे पेरण्यापूर्वीच तुमच्या कापणीच्या प्रमाणाचा सहज अंदाज लावा.",
+                diseaseTitle: "वनस्पती डॉक्टर",
+                diseaseDesc: "तुमच्या फोनवरून संक्रमित पानाचा फोटो अपलोड करून वनस्पतींच्या रोगांची त्वरित ओळख करा.",
+                weatherTitle: "स्थानिक हवामान",
+                weatherDesc: "तुमच्या दैनंदिन शेतीच्या हालचालींचे नियोजन करण्यासाठी रिअल-टाइम स्थानिक अचूक हवामान अपडेट्स."
+            },
+            showcaseTitle: "तुमच्या खिशात स्मार्ट शेती",
+            showcaseSubtitle: "कोणत्याही गुंतागुंतीच्या मॅन्युअलची आवश्यकता नाही. अॅग्रीमेट अविश्वसनीयपणे अंतर्ज्ञानी होण्यासाठी तयार केले गेले आहे, शेतातही तुमच्या स्मार्टफोनवर उत्तम प्रकारे काम करते.",
+            showcasePoints: [
+                "आमच्या तज्ञ एआय चॅटबॉटकडून त्वरित उत्तरे",
+                "अनेक स्थानिक भाषांसाठी पूर्ण समर्थन",
+                "मोबाइल नेटवर्कसाठी अत्यंत अनुकूलित",
+                "सुरक्षित, खाजगी आणि तुमच्या नियंत्रणात"
+            ],
+            ctaTitle: "तुम्ही तुमची शेती आधुनिक करण्यासाठी तयार आहात का?",
+            ctaSubtitle: "उत्पादन वाढवण्यासाठी आणि शेतीतील धोके कमी करण्यासाठी अॅग्रीमेट वापरणाऱ्या हजारो स्मार्ट शेतकऱ्यांमध्ये सामील व्हा.",
+            createAccount: "तुमचे मोफत खाते तयार करा",
+            footer: "अॅग्रीमेट एआय. आधुनिक शेतकऱ्यासाठी निर्मित."
+        },
+        login: {
+            title: "परत आल्याबद्दल स्वागत आहे",
+            subtitle: "अॅग्रीमेट सुरू ठेवण्यासाठी साइन इन करा",
+            email: "ईमेल पत्ता",
+            password: "पासवर्ड",
+            emailPlaceholder: "you@example.com",
+            passwordPlaceholder: "••••••••",
+            signIn: "साइन इन करा",
+            orContinue: "किंवा यासह सुरू ठेवा",
+            noAccount: "खाते नाहीये?",
+            signUp: "साइन अप करा"
+        },
+        signup: {
+            title: "खाते तयार करा",
+            subtitle: "आजच अॅग्रीमेट समुदायात सामील व्हा",
+            fullName: "पूर्ण नाव",
+            namePlaceholder: "जॉन डो",
+            email: "ईमेल पत्ता",
+            emailPlaceholder: "you@example.com",
+            password: "पासवर्ड",
+            passwordPlaceholder: "••••••••",
+            createAccount: "खाते तयार करा",
+            orContinue: "किंवा यासह सुरू ठेवा",
+            hasAccount: "आधीपासूनच खाते आहे?",
+            signIn: "साइन इन करा"
+        },
+        profile: {
+            title: "माझे प्रोफाइल",
+            accountType: "खाता प्रकार",
+            local: "स्थानिक",
+            status: "स्थिती",
+            active: "सक्रिय",
+            signOut: "साइन आउट"
         }
     }
 };

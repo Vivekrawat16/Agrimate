@@ -91,10 +91,17 @@ const googleAuth = asyncHandler(async (req, res) => {
         throw new Error('Google token is missing');
     }
 
+    let payload;
     try {
-        const payload = await verifyGoogleToken(token);
-        const { email, name, sub: googleId } = payload;
+        payload = await verifyGoogleToken(token);
+    } catch (error) {
+        res.status(401);
+        throw new Error('Invalid Google token: ' + error.message);
+    }
 
+    const { email, name, sub: googleId } = payload;
+
+    try {
         // Check if user already exists
         let user = await User.findOne({ email });
 
@@ -123,8 +130,9 @@ const googleAuth = asyncHandler(async (req, res) => {
             provider: user.provider
         });
     } catch (error) {
-        res.status(401);
-        throw new Error('Invalid Google token');
+        console.error("Database error during Google Auth:", error);
+        res.status(500);
+        throw new Error('Server error during Google authentication');
     }
 });
 
