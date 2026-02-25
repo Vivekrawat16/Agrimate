@@ -28,6 +28,11 @@ app.use('/api/auth', require('./routes/authRoutes'));
 // Serve static assets in production
 const path = require('path');
 
+// Handle unmatched API routes
+app.use('/api', (req, res) => {
+    res.status(404).json({ success: false, message: 'API Route Not Found' });
+});
+
 // Serve static assets if in production
 if (process.env.NODE_ENV === 'production') {
     // Set static folder

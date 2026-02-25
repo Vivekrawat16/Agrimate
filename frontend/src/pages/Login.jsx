@@ -33,7 +33,10 @@ const Login = () => {
     const handleGoogleSuccess = async (credentialResponse) => {
         try {
             const { credential } = credentialResponse;
-            const res = await axios.post('http://localhost:5000/api/auth/google', { token: credential });
+            const apiUrl = import.meta.env.MODE === 'development'
+                ? 'http://localhost:5000/api/auth/google'
+                : '/api/auth/google';
+            const res = await axios.post(apiUrl, { token: credential });
 
             if (res.data.token) {
                 googleLogin(res.data);
