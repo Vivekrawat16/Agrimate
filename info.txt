@@ -28,6 +28,9 @@ Go:
 cd ~/Agrimate/frontend
 npm install
 npm run build
+nenwknk
+
+
 
 
 pm2 reload agrimate-backend
